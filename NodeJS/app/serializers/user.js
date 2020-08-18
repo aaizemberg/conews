@@ -1,0 +1,3 @@
+exports.serializeUser = user => ({
+  user
+});
