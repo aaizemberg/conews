@@ -1,8 +1,11 @@
 const Parser = require('rss-parser');
 const parser = new Parser();
 
-exports.getNews = () =>
-  parser.parseURL(
-    // eslint-disable-next-line max-len
-    'https://news.google.com/rss/topics/CAAqKAgKIiJDQkFTRXdvSkwyMHZNREZqY0hsNUVnWmxjeTAwTVRrb0FBUAE?hl=es-419&gl=AR&ceid=AR%3Aes-419'
-  );
+exports.getNews = async links => {
+  let items = [];
+  for (let i = 0; i < links.length; i++) {
+    const newItems = await parser.parseURL(links[i]);
+    items = [...items, ...newItems.items];
+  }
+  return { items };
+};
