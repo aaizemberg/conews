@@ -17,7 +17,7 @@ exports.getLastPubdate = (req, res, next) => {
   logger.info(`Getting last date from ${SOURCES[source].name}...`);
   const feeds = getLinks(source, feed);
   return getNews(feeds)
-    .then(response => res.send(response.items[0].pubDate))
+    .then(response => res.send({ response: 'ok', data: response.items[0].pubDate }))
     .catch(next);
 };
 
