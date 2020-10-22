@@ -16,6 +16,20 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.ENUM,
         values: ['MISC', 'PER', 'LOC', 'ORG']
       },
+      titularOrSummary: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+      },
+      initialPosition: {
+        type: Sequelize.INTEGER
+      },
+      endPosition: {
+        type: Sequelize.INTEGER
+      },
+      programId: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+      },
       coreNewId: {
         type: Sequelize.INTEGER
       }
