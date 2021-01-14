@@ -1,10 +1,10 @@
-/* eslint-disable new-cap */
 'use strict';
 module.exports = {
   up: (queryInterface, Sequelize) =>
-    queryInterface.createTable('CoreNews', {
-      proxylogicaldeletemodel_ptr_id: {
+    queryInterface.createTable('News', {
+      id: {
         type: Sequelize.INTEGER,
+        autoIncrement: true,
         allowNull: false,
         primaryKey: true
       },
@@ -17,27 +17,19 @@ module.exports = {
         allowNull: false
       },
       url: {
-        type: Sequelize.STRING(4096),
+        type: Sequelize.STRING,
         allowNull: false
-      },
-      source_id: {
-        type: Sequelize.INTEGER,
-        allowNull: true
       },
       content: {
         type: Sequelize.STRING,
         allowNull: true
       },
-      media: {
-        type: Sequelize.STRING,
-        allowNull: true
-      },
-      publication_date: {
+      publicationDate: {
         type: Sequelize.DATE,
         allowNull: true
       },
-      category: {
-        type: Sequelize.STRING,
+      feedId: {
+        type: Sequelize.INTEGER,
         allowNull: true
       },
       createdAt: {
@@ -49,5 +41,5 @@ module.exports = {
         type: Sequelize.DATE
       }
     }),
-  down: queryInterface => queryInterface.dropTable('CoreNews')
+  down: queryInterface => queryInterface.dropTable('News')
 };

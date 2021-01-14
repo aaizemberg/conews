@@ -13,25 +13,22 @@ module.exports = {
         allowNull: false
       },
       type: {
-        type: Sequelize.ENUM,
-        values: ['MISC', 'PER', 'LOC', 'ORG']
-      },
-      titularOrSummary: {
+        // type: Sequelize.ENUM,
+        // values: ['MISC', 'PER', 'LOC', 'ORG']
         type: Sequelize.INTEGER,
         allowNull: false
       },
-      initialPosition: {
-        type: Sequelize.INTEGER
-      },
-      endPosition: {
-        type: Sequelize.INTEGER
-      },
-      programId: {
+      field: {
+        // type: Sequelize.ENUM,
+        // values: ['TITLE', 'SUMMARY', 'CONTENT']
         type: Sequelize.INTEGER,
         allowNull: false
       },
-      coreNewId: {
-        type: Sequelize.INTEGER
+      program: {
+        // type: Sequelize.ENUM,
+        // values: ['NERD_API', 'SPACY_1', 'SPACY_2', 'SPACY_3']
+        type: Sequelize.INTEGER,
+        allowNull: false
       },
       createdAt: {
         allowNull: false,

@@ -3,41 +3,38 @@ module.exports = (sequelize, Sequelize) => {
   const Entities = sequelize.define(
     'Entities',
     {
-      id: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        primaryKey: true
-      },
+      id: { type: Sequelize.INTEGER, autoIncrement: true, allowNull: false, primaryKey: true },
       name: {
         type: Sequelize.STRING,
         allowNull: false
       },
       type: {
-        type: Sequelize.ENUM,
-        values: ['MISC', 'PER', 'LOC', 'ORG']
-      },
-      titularOrSummary: {
+        // type: Sequelize.ENUM,
+        // values: ['MISC', 'PER', 'LOC', 'ORG']
         type: Sequelize.INTEGER,
         allowNull: false
       },
-      initialPosition: {
-        type: Sequelize.INTEGER
-      },
-      endPosition: {
-        type: Sequelize.INTEGER
-      },
-      programId: {
+      field: {
+        // type: Sequelize.ENUM,
+        // values: ['TITLE', 'SUMMARY', 'CONTENT']
         type: Sequelize.INTEGER,
         allowNull: false
       },
-      coreNewId: {
-        type: Sequelize.INTEGER
+      program: {
+        // type: Sequelize.ENUM,
+        // values: ['NERD_API', 'SPACY_1', 'SPACY_2', 'SPACY_3']
+        type: Sequelize.INTEGER,
+        allowNull: false
       }
     },
     {}
   );
-  Entities.associate = () => {
-    // associations can be defined here
+  Entities.associate = models => {
+    Entities.belongsToMany(models.News, {
+      through: 'EntitiesNews',
+      as: 'news',
+      foreignKey: 'entityId'
+    });
   };
   return Entities;
 };
