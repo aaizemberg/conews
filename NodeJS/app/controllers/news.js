@@ -1,7 +1,10 @@
 const { getNews } = require('../services/googleNews'),
   logger = require('../logger'),
   // schedule = require('node-schedule'),
-  { News, Feeds } = require('../models');
+  { News, Feeds } = require('../models'),
+  Sequelize = require('sequelize'),
+  { Op } = require('sequelize'),
+  { getDate } = require('./utils');
 
 exports.getPeriodicNews = (req, res, next) => {
   // schedule.scheduleJob('0 * * * *', () => {
@@ -39,7 +42,24 @@ exports.getPeriodicNews = (req, res, next) => {
 
 exports.getNewsQuantity = (req, res, next) => {
   logger.info('Getting news...');
-  return News.findAll()
-    .then(response => res.send(response))
-    .catch(next);
+  return (
+    News.findAll({
+      where: {
+        publicationDate: {
+          [Op.ne]: null
+        }
+      },
+      attributes: ['publicationDate', [Sequelize.fn('COUNT', Sequelize.col('id')), 'cantidad']],
+      group: 'publicationDate'
+    })
+      // .then(response => res.send(response.map(item => ({ cantidad: item.cantidad }))))
+      .then(response => {
+        const formatDateResponse = response.map(item => ({
+          publicationDate: getDate(item.publicationDate),
+          cantidad: item.cantidad
+        }));
+        return res.send(response);
+      })
+      .catch(next)
+  );
 };
