@@ -41,6 +41,39 @@ exports.getNews = (req, res, next) => {
     .catch(next);
 };
 
+exports.getPeriodicNews = (req, res, next) => {
+  schedule.scheduleJob('0 * * * *', () => {
+    logger.info('Getting news...');
+    return getNews([
+      // eslint-disable-next-line max-len
+      'https://news.google.com/rss/topics/CAAqKAgKIiJDQkFTRXdvSkwyMHZNREZqY0hsNUVnWmxjeTAwTVRrb0FBUAE?hl=es-419&gl=AR&ceid=AR%3Aes-419'
+    ])
+      .then(response => {
+        response.items.map(async item => {
+          const news = await GoogleNews.findOne({
+            where: {
+              link: item.link
+            }
+          });
+          if (!news) {
+            const { title, link, pubDate, content } = item;
+            const source = title.split(' - ');
+            await GoogleNews.create({
+              title,
+              link,
+              pubDate,
+              content,
+              source: source[source.length - 1]
+            });
+          }
+        });
+        return res.send('OK');
+      })
+      .catch(next);
+  });
+  return res.send('Schedule created!');
+};
+
 exports.getPeriodicGoogleNews = (req, res, next) => {
   schedule.scheduleJob('0 * * * *', () => {
     logger.info('Getting Google news...');
