@@ -36,3 +36,10 @@ exports.getPeriodicNews = (req, res, next) => {
   // });
   // return res.send('Schedule created!');
 };
+
+exports.getNewsQuantity = (req, res, next) => {
+  logger.info('Getting news...');
+  return News.findAll()
+    .then(response => res.send(response))
+    .catch(next);
+};

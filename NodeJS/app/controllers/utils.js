@@ -26,3 +26,8 @@ exports.getLinks = (source, feed) => {
   }
   return feeds;
 };
+
+exports.success = data => ({
+  status: 'success',
+  data
+});
