@@ -42,25 +42,28 @@ exports.getPeriodicNews = (req, res, next) => {
 
 exports.getNewsQuantity = (req, res, next) => {
   logger.info('Getting news...');
-  return (
-    News.findAll({
-      where: {
-        publicationDate: {
-          [Op.ne]: null
-        }
+  const { d_from, d_to, words } = req.query;
+  return News.findAll({
+    where: {
+      publicationDate: {
+        [Op.ne]: null,
+        [Op.gt]: d_from ? new Date(d_from) : new Date('2000-01-01'),
+        [Op.lte]: d_to ? new Date(d_to) : new Date('2100-01-01')
       },
-      attributes: ['publicationDate', [Sequelize.fn('COUNT', Sequelize.col('id')), 'cantidad']],
-      group: 'publicationDate',
-      order: [['publicationDate', 'DESC']]
-    })
-      // .then(response => res.send(response.map(item => ({ cantidad: item.cantidad }))))
-      .then(response =>
-        /* const formatDateResponse = response.map(item => ({
+      title: {
+        [Op.like]: words ? `%${words}%` : '%'
+      }
+    },
+    attributes: ['publicationDate', [Sequelize.fn('COUNT', Sequelize.col('id')), 'cantidad']],
+    group: 'publicationDate',
+    order: [['publicationDate', 'DESC']]
+  })
+    .then(response =>
+      /* const formatDateResponse = response.map(item => ({
           publicationDate: getDate(item.publicationDate),
           cantidad: item.cantidad
         }));*/
-        res.send(success(response))
-      )
-      .catch(next)
-  );
+      res.send(success(response))
+    )
+    .catch(next);
 };
