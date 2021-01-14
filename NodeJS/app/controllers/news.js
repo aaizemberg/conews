@@ -4,7 +4,7 @@ const { getNews } = require('../services/googleNews'),
   { News, Feeds } = require('../models'),
   Sequelize = require('sequelize'),
   { Op } = require('sequelize'),
-  { getDate } = require('./utils');
+  { getDate, success } = require('./utils');
 
 exports.getPeriodicNews = (req, res, next) => {
   // schedule.scheduleJob('0 * * * *', () => {
@@ -26,7 +26,7 @@ exports.getPeriodicNews = (req, res, next) => {
               title,
               summary: content,
               url: link,
-              publicationDate: pubDate,
+              publicationDate: getDate(new Date(pubDate)),
               content,
               feedId: feeds[i].id
             });
@@ -50,16 +50,17 @@ exports.getNewsQuantity = (req, res, next) => {
         }
       },
       attributes: ['publicationDate', [Sequelize.fn('COUNT', Sequelize.col('id')), 'cantidad']],
-      group: 'publicationDate'
+      group: 'publicationDate',
+      order: [['publicationDate', 'DESC']]
     })
       // .then(response => res.send(response.map(item => ({ cantidad: item.cantidad }))))
-      .then(response => {
-        const formatDateResponse = response.map(item => ({
+      .then(response =>
+        /* const formatDateResponse = response.map(item => ({
           publicationDate: getDate(item.publicationDate),
           cantidad: item.cantidad
-        }));
-        return res.send(response);
-      })
+        }));*/
+        res.send(success(response))
+      )
       .catch(next)
   );
 };
