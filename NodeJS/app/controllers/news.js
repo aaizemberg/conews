@@ -1,7 +1,7 @@
 const { getNews } = require('../services/googleNews'),
   logger = require('../logger'),
   // schedule = require('node-schedule'),
-  { News, Feeds } = require('../models'),
+  { News, Feeds, Sources } = require('../models'),
   Sequelize = require('sequelize'),
   { Op } = require('sequelize'),
   { getDate, success } = require('./utils');
@@ -56,6 +56,47 @@ exports.getNewsQuantity = (req, res, next) => {
     },
     attributes: ['publicationDate', [Sequelize.fn('COUNT', Sequelize.col('id')), 'cantidad']],
     group: 'publicationDate',
+    order: [['publicationDate', 'DESC']]
+  })
+    .then(response =>
+      /* const formatDateResponse = response.map(item => ({
+          publicationDate: getDate(item.publicationDate),
+          cantidad: item.cantidad
+        }));*/
+      res.send(success(response))
+    )
+    .catch(next);
+};
+
+exports.heatmap = (req, res, next) => {
+  logger.info('Getting news...');
+  const { d_from, d_to, words } = req.query;
+  return News.findAll({
+    where: {
+      publicationDate: {
+        [Op.ne]: null,
+        [Op.gt]: d_from ? new Date(d_from) : new Date('2000-01-01'),
+        [Op.lte]: d_to ? new Date(d_to) : new Date('2100-01-01')
+      },
+      title: {
+        [Op.like]: words ? `%${words}%` : '%'
+      }
+    },
+    include: [
+      {
+        model: Feeds,
+        as: 'feed',
+        attributes: ['id'],
+        include: [
+          {
+            model: Sources,
+            as: 'source',
+            attributes: ['name']
+          }
+        ],
+        group: ['publicationDate', 'source.name']
+      }
+    ],
     order: [['publicationDate', 'DESC']]
   })
     .then(response =>
