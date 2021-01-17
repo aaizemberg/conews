@@ -4,7 +4,8 @@ const { getNews } = require('../services/googleNews'),
   { News, Feeds, Sources } = require('../models'),
   Sequelize = require('sequelize'),
   { Op } = require('sequelize'),
-  { getDate, success } = require('./utils');
+  { getDate, success } = require('./utils'),
+  db = require('../models');
 
 exports.getPeriodicNews = (req, res, next) => {
   // schedule.scheduleJob('0 * * * *', () => {
@@ -40,6 +41,32 @@ exports.getPeriodicNews = (req, res, next) => {
   // return res.send('Schedule created!');
 };
 
+exports.getNewsQuantitySQL = async (req, res) => {
+  logger.info('Getting news...');
+  const { d_from, d_to, words, sources } = req.query;
+  const sources_arr = sources ? sources.split(',') : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
+  const news = await db.sequelize.query(
+    '\
+  SELECT "News"."publicationDate", COUNT("News"."id") AS Cantidad \
+  FROM "News" INNER JOIN "Feeds" ON "News"."feedId"="Feeds"."id" \
+  INNER JOIN "Sources" ON "Feeds"."sourceId"="Sources"."id" \
+  WHERE "News"."publicationDate" IS NOT NULL AND "News"."publicationDate" >= (:d_from) \
+  AND "News"."publicationDate" <= (:d_to) AND "News"."title" LIKE (:words) AND "Sources"."id" IN (:sources)\
+  GROUP BY "News"."publicationDate"\
+  ORDER BY "News"."publicationDate" DESC',
+    {
+      replacements: {
+        d_from: d_from ? d_from : '2000-01-01',
+        d_to: d_to ? d_to : '2100-01-01',
+        words: words ? `%${words}%` : '%',
+        sources: sources_arr
+      },
+      type: db.sequelize.QueryTypes.SELECT
+    }
+  );
+  return res.send(news);
+};
+
 exports.getNewsQuantity = (req, res, next) => {
   logger.info('Getting news...');
   const { d_from, d_to, words } = req.query;
@@ -66,6 +93,32 @@ exports.getNewsQuantity = (req, res, next) => {
       res.send(success(response))
     )
     .catch(next);
+};
+
+exports.heatmapSQL = async (req, res) => {
+  logger.info('Getting news...');
+  const { d_from, d_to, words, sources } = req.query;
+  const sources_arr = sources ? sources.split(',') : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
+  const news = await db.sequelize.query(
+    '\
+  SELECT "News"."publicationDate", "Sources"."name" AS "source_name", COUNT("News"."id") AS Cantidad \
+  FROM "News" INNER JOIN "Feeds" ON "News"."feedId"="Feeds"."id" \
+  INNER JOIN "Sources" ON "Feeds"."sourceId"="Sources"."id" \
+  WHERE "News"."publicationDate" IS NOT NULL AND "News"."publicationDate" >= (:d_from) \
+  AND "News"."publicationDate" <= (:d_to) AND "News"."title" LIKE (:words) AND "Sources"."id" IN (:sources)\
+  GROUP BY "News"."publicationDate", "Sources"."name"\
+  ORDER BY "News"."publicationDate" DESC',
+    {
+      replacements: {
+        d_from: d_from ? d_from : '2000-01-01',
+        d_to: d_to ? d_to : '2100-01-01',
+        words: words ? `%${words}%` : '%',
+        sources: sources_arr
+      },
+      type: db.sequelize.QueryTypes.SELECT
+    }
+  );
+  return res.send(news);
 };
 
 exports.heatmap = (req, res, next) => {
