@@ -64,7 +64,7 @@ exports.getNewsQuantitySQL = async (req, res) => {
       type: db.sequelize.QueryTypes.SELECT
     }
   );
-  return res.send(news);
+  return res.send(success(news));
 };
 
 exports.getNewsQuantity = (req, res, next) => {
@@ -118,7 +118,7 @@ exports.heatmapSQL = async (req, res) => {
       type: db.sequelize.QueryTypes.SELECT
     }
   );
-  return res.send(news);
+  return res.send(success(news));
 };
 
 exports.heatmap = (req, res, next) => {
