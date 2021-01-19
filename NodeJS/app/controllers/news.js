@@ -21,6 +21,7 @@ exports.getPeriodicNews = (req, res, next) => {
               url: item.link
             }
           });
+          // TODO: Agregar el title como PK
           if (!news) {
             const { title, link, pubDate, content } = item;
             await News.create({
