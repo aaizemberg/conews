@@ -9,7 +9,14 @@ const {
   } = require('./controllers/googleNews'),
   { insertSources, getSources } = require('./controllers/sources'),
   { insertFeeds } = require('./controllers/feeds'),
-  { getPeriodicNews, getNewsQuantitySQL, heatmapSQL, searchSQL, wordtree } = require('./controllers/news');
+  {
+    getPeriodicNews,
+    getNewsQuantitySQL,
+    heatmapSQL,
+    searchSQL,
+    wordtree,
+    wordcloud
+  } = require('./controllers/news');
 
 exports.init = app => {
   app.get('/', (req, res) => res.send('Welcome to Heroku'));
@@ -19,13 +26,13 @@ exports.init = app => {
   app.post('/insert-feeds', insertFeeds);
   app.get('/periodic-news', getPeriodicNews);
   app.get('/medios', getSources);
-  // TODO: Poner date en lugar de publicationDate en cantidad de noticias
   // TODO: Agregar tabla de stopwords y ver si agregamos tabla de palabras
   // TODO: Para el endpoint de entidades, agregar parametros en la busqueda como rango de fechas, etc
   app.get('/cantidad-de-noticias', getNewsQuantitySQL);
   app.get('/heatmap', heatmapSQL);
   app.get('/busqueda', searchSQL);
   app.get('/wordtree', wordtree);
+  app.get('/nube-de-palabras', wordcloud);
   // app.post('/google-news', getPeriodicGoogleNews);
   // app.get('/google-news', getGoogleNews);
 };

@@ -271,3 +271,55 @@ exports.search = (req, res, next) => {
     })
     .catch(next);
 };
+
+// eslint-disable-next-line complexity
+exports.wordcloud = async (req, res) => {
+  logger.info('Word cloud...');
+  const { d_from, d_to, words, sources, limit } = req.query;
+  const sources_arr = sources ? sources.split(',') : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
+  const news = await db.sequelize.query(
+    '\
+  SELECT "News"."title" \
+  FROM "News" INNER JOIN "Feeds" ON "News"."feedId"="Feeds"."id" \
+  INNER JOIN "Sources" ON "Feeds"."sourceId"="Sources"."id" \
+  WHERE "News"."publicationDate" IS NOT NULL AND "News"."publicationDate" >= (:d_from) \
+  AND "News"."publicationDate" <= (:d_to) AND "News"."title" LIKE (:words) AND "Sources"."id" IN (:sources)\
+  ORDER BY "News"."id" ASC',
+    {
+      replacements: {
+        d_from: d_from ? d_from : '2000-01-01',
+        d_to: d_to ? d_to : '2100-01-01',
+        words: words ? `% ${words} %` : '%',
+        sources: sources_arr
+      },
+      type: db.sequelize.QueryTypes.SELECT
+    }
+  );
+  let response = [];
+  for (let i = 0; i < news.length; i++) {
+    const title = news[i].title
+      .replace(',', '')
+      .replace(':', '')
+      .replace('"', '');
+    const titleWords = title.split(' ');
+    let found = false;
+    for (let j = 0; j < titleWords.length; j++) {
+      if (response.length === 0) {
+        response = [{ word: titleWords[j], s: 1 }];
+      }
+      found = false;
+      for (let k = 0; k < response.length; k++) {
+        if (response[k].word === titleWords[j]) {
+          response[k] = { word: response[k].word, s: response[k].s + 1 };
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        response = [...response, { word: titleWords[j], s: 1 }];
+      }
+    }
+  }
+  response.sort((a, b) => b.s - a.s);
+  return res.send(response.slice(0, limit));
+};
