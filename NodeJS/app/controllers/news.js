@@ -356,7 +356,7 @@ exports.trends = async (req, res) => {
   INNER JOIN "Sources" ON "Feeds"."sourceId"="Sources"."id" \
   WHERE "News"."publicationDate" IS NOT NULL AND "News"."publicationDate" >= (:d_from) \
   AND "News"."publicationDate" <= (:d_to) AND "Sources"."id" IN (:sources)\
-  ORDER BY "News"."publicationDate" ASC LIMIT 3', // el LIMIT despues sacarlo
+  ORDER BY "News"."publicationDate" ASC',
     {
       replacements: {
         d_from: d_from ? d_from : '2000-01-01',
@@ -374,7 +374,7 @@ exports.trends = async (req, res) => {
       .replace('"', '')
       .replace('.', '');
     logger.info(title);
-    if (i === 0 || news[i - 1].publication_date !== news[i].publicationDate) {
+    if (i === 0 || news[i - 1].publication_date !== news[i].publication_date) {
       let words_obj = {};
       for (let j = 0; j < words_arr.length; j++) {
         words_obj = { ...words_obj, [words_arr[j]]: title.split(`${words_arr[j]}`).length - 1 };
