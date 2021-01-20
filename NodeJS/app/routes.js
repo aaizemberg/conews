@@ -27,7 +27,7 @@ exports.init = app => {
   app.post('/insert-feeds', insertFeeds);
   app.get('/periodic-news', getPeriodicNews);
   app.get('/medios', getSources);
-  // TODO: Agregar tabla de stopwords y ver si agregamos tabla de palabras
+  // TODO: Agregar tabla de stopwords
   // TODO: Para el endpoint de entidades, agregar parametros en la busqueda como rango de fechas, etc
   app.get('/cantidad-de-noticias', getNewsQuantitySQL);
   app.get('/heatmap', heatmapSQL);
