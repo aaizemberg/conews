@@ -321,5 +321,23 @@ exports.wordcloud = async (req, res) => {
     }
   }
   response.sort((a, b) => b.s - a.s);
-  return res.send(response.slice(0, limit));
+  const stopwords = [
+    'de',
+    'la',
+    'en',
+    'y',
+    'el',
+    'a',
+    'del',
+    'que',
+    'un',
+    'los',
+    'para',
+    'con',
+    'por',
+    'una'
+  ];
+  // response = response.filter(item => !stopwords.contains(item.word));
+  response = response.slice(0, limit);
+  return res.send(success(response));
 };
