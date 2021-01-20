@@ -15,19 +15,19 @@ module.exports = {
       type: {
         // type: Sequelize.ENUM,
         // values: ['MISC', 'PER', 'LOC', 'ORG']
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
         allowNull: false
       },
       field: {
         // type: Sequelize.ENUM,
         // values: ['TITLE', 'SUMMARY', 'CONTENT']
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
         allowNull: false
       },
       program: {
         // type: Sequelize.ENUM,
         // values: ['NERD_API', 'SPACY_1', 'SPACY_2', 'SPACY_3']
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
         allowNull: false
       },
       createdAt: {
