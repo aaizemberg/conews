@@ -15,7 +15,8 @@ const {
     heatmapSQL,
     searchSQL,
     wordtree,
-    wordcloud
+    wordcloud,
+    trends
   } = require('./controllers/news');
 
 exports.init = app => {
@@ -33,6 +34,7 @@ exports.init = app => {
   app.get('/busqueda', searchSQL);
   app.get('/wordtree', wordtree);
   app.get('/nube-de-palabras', wordcloud);
+  app.get('/tendencias', trends);
   // app.post('/google-news', getPeriodicGoogleNews);
   // app.get('/google-news', getGoogleNews);
 };

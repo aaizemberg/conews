@@ -300,7 +300,8 @@ exports.wordcloud = async (req, res) => {
     const title = news[i].title
       .replace(',', '')
       .replace(':', '')
-      .replace('"', '');
+      .replace('"', '')
+      .replace('.', '');
     const titleWords = title.split(' ');
     let found = false;
     for (let j = 0; j < titleWords.length; j++) {
@@ -340,4 +341,54 @@ exports.wordcloud = async (req, res) => {
   response = response.filter(item => !stopwords.includes(item.word));
   response = response.slice(0, limit);
   return res.send(success(response));
+};
+
+// eslint-disable-next-line complexity
+exports.trends = async (req, res) => {
+  logger.info('Tendencias...');
+  const { d_from, d_to, words, sources } = req.query;
+  const sources_arr = sources ? sources.split(',') : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
+  const words_arr = words ? words.split(',') : [];
+  const news = await db.sequelize.query(
+    '\
+  SELECT "News"."title", "News"."publicationDate" AS "publication_date" \
+  FROM "News" INNER JOIN "Feeds" ON "News"."feedId"="Feeds"."id" \
+  INNER JOIN "Sources" ON "Feeds"."sourceId"="Sources"."id" \
+  WHERE "News"."publicationDate" IS NOT NULL AND "News"."publicationDate" >= (:d_from) \
+  AND "News"."publicationDate" <= (:d_to) AND "Sources"."id" IN (:sources)\
+  ORDER BY "News"."publicationDate" ASC LIMIT 3', // el LIMIT despues sacarlo
+    {
+      replacements: {
+        d_from: d_from ? d_from : '2000-01-01',
+        d_to: d_to ? d_to : '2100-01-01',
+        sources: sources_arr
+      },
+      type: db.sequelize.QueryTypes.SELECT
+    }
+  );
+  let response = [];
+  for (let i = 0; i < news.length; i++) {
+    const title = news[i].title
+      .replace(',', '')
+      .replace(':', '')
+      .replace('"', '')
+      .replace('.', '');
+    if (i === 0 || news[i - 1].publication_date !== news[i].publicationDate) {
+      let words_obj = {};
+      for (let j = 0; j < words_arr.length; j++) {
+        words_obj = { ...words_obj, [words_arr[i]]: title.split(` ${words_arr[i]} `).length - 1 };
+      }
+      response = [...response, { publication_date: news[i].publicationDate, ...words_obj }];
+    } else {
+      let previous_obj = response[response.length - 1];
+      for (let j = 0; j < words_arr.length; j++) {
+        previous_obj = {
+          ...previous_obj,
+          [words_arr[i]]: previous_obj[words_arr[i]] + title.split(` ${words_arr[i]} `).length - 1
+        };
+      }
+      response[response.length - 1] = previous_obj;
+    }
+  }
+  return res.send(response);
 };
