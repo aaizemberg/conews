@@ -337,7 +337,7 @@ exports.wordcloud = async (req, res) => {
     'por',
     'una'
   ];
-  // response = response.filter(item => !stopwords.contains(item.word));
+  response = response.filter(item => !stopwords.includes(item.word));
   response = response.slice(0, limit);
   return res.send(success(response));
 };
