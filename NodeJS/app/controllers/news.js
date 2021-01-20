@@ -373,18 +373,19 @@ exports.trends = async (req, res) => {
       .replace(':', '')
       .replace('"', '')
       .replace('.', '');
+    logger.info(title);
     if (i === 0 || news[i - 1].publication_date !== news[i].publicationDate) {
       let words_obj = {};
       for (let j = 0; j < words_arr.length; j++) {
-        words_obj = { ...words_obj, [words_arr[i]]: title.split(` ${words_arr[i]} `).length - 1 };
+        words_obj = { ...words_obj, [words_arr[j]]: title.split(`${words_arr[j]}`).length - 1 };
       }
-      response = [...response, { publication_date: news[i].publicationDate, ...words_obj }];
+      response = [...response, { publication_date: news[i].publication_date, ...words_obj }];
     } else {
       let previous_obj = response[response.length - 1];
       for (let j = 0; j < words_arr.length; j++) {
         previous_obj = {
           ...previous_obj,
-          [words_arr[i]]: previous_obj[words_arr[i]] + title.split(` ${words_arr[i]} `).length - 1
+          [words_arr[j]]: previous_obj[words_arr[j]] + title.split(` ${words_arr[j]} `).length - 1
         };
       }
       response[response.length - 1] = previous_obj;
