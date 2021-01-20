@@ -48,7 +48,7 @@ exports.getNewsQuantitySQL = async (req, res) => {
   const sources_arr = sources ? sources.split(',') : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
   const news = await db.sequelize.query(
     '\
-  SELECT "News"."publicationDate", COUNT("News"."id") AS Cantidad \
+  SELECT "News"."publicationDate" AS "date", COUNT("News"."id") AS cantidad \
   FROM "News" INNER JOIN "Feeds" ON "News"."feedId"="Feeds"."id" \
   INNER JOIN "Sources" ON "Feeds"."sourceId"="Sources"."id" \
   WHERE "News"."publicationDate" IS NOT NULL AND "News"."publicationDate" >= (:d_from) \
@@ -102,7 +102,7 @@ exports.heatmapSQL = async (req, res) => {
   const sources_arr = sources ? sources.split(',') : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
   const news = await db.sequelize.query(
     '\
-  SELECT "News"."publicationDate", "Sources"."name" AS "source_name", COUNT("News"."id") AS Cantidad \
+  SELECT "News"."publicationDate" AS "date", "Sources"."name" AS "source_name", COUNT("News"."id") AS "news_count" \
   FROM "News" INNER JOIN "Feeds" ON "News"."feedId"="Feeds"."id" \
   INNER JOIN "Sources" ON "Feeds"."sourceId"="Sources"."id" \
   WHERE "News"."publicationDate" IS NOT NULL AND "News"."publicationDate" >= (:d_from) \
