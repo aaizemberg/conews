@@ -162,3 +162,112 @@ exports.heatmap = (req, res, next) => {
     )
     .catch(next);
 };
+
+exports.searchSQL = async (req, res) => {
+  logger.info('Search...');
+  const { d_from, d_to, words, sources, page, limit } = req.query;
+  const sources_arr = sources ? sources.split(',') : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
+  const news = await db.sequelize.query(
+    '\
+  SELECT "News"."url", "Sources"."name" AS "source", "News"."summary", "News"."title" \
+  FROM "News" INNER JOIN "Feeds" ON "News"."feedId"="Feeds"."id" \
+  INNER JOIN "Sources" ON "Feeds"."sourceId"="Sources"."id" \
+  WHERE "News"."publicationDate" IS NOT NULL AND "News"."publicationDate" >= (:d_from) \
+  AND "News"."publicationDate" <= (:d_to) AND "News"."title" LIKE (:words) AND "Sources"."id" IN (:sources)\
+  ORDER BY "News"."id" ASC\
+  OFFSET (:offset) ROWS\
+  FETCH NEXT (:limit) ROWS ONLY',
+    {
+      replacements: {
+        d_from: d_from ? d_from : '2000-01-01',
+        d_to: d_to ? d_to : '2100-01-01',
+        words: words ? `% ${words} %` : '%',
+        sources: sources_arr,
+        offset: (page - 1) * limit,
+        limit
+      },
+      type: db.sequelize.QueryTypes.SELECT
+    }
+  );
+  return res.send(success(news));
+};
+
+exports.wordtree = async (req, res) => {
+  logger.info('Search...');
+  const { d_from, d_to, words, sources, page, limit } = req.query;
+  const sources_arr = sources ? sources.split(',') : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
+  const news = await db.sequelize.query(
+    '\
+  SELECT "News"."title" \
+  FROM "News" INNER JOIN "Feeds" ON "News"."feedId"="Feeds"."id" \
+  INNER JOIN "Sources" ON "Feeds"."sourceId"="Sources"."id" \
+  WHERE "News"."publicationDate" IS NOT NULL AND "News"."publicationDate" >= (:d_from) \
+  AND "News"."publicationDate" <= (:d_to) AND "News"."title" LIKE (:words) AND "Sources"."id" IN (:sources)\
+  ORDER BY "News"."id" ASC\
+  OFFSET (:offset) ROWS\
+  FETCH NEXT (:limit) ROWS ONLY',
+    {
+      replacements: {
+        d_from: d_from ? d_from : '2000-01-01',
+        d_to: d_to ? d_to : '2100-01-01',
+        words: words ? `% ${words} %` : '%',
+        sources: sources_arr,
+        offset: (page - 1) * limit,
+        limit
+      },
+      type: db.sequelize.QueryTypes.SELECT
+    }
+  );
+  return res.send(success(news));
+};
+
+exports.search = (req, res, next) => {
+  const { words, limit, d_from, d_to } = req.query;
+  News.findAndCountAll({
+    where: {
+      publicationDate: {
+        [Op.ne]: null,
+        [Op.gt]: d_from ? new Date(d_from) : new Date('2000-01-01'),
+        [Op.lte]: d_to ? new Date(d_to) : new Date('2100-01-01')
+      },
+      title: {
+        [Op.like]: words ? `% ${words} %` : '%'
+      },
+      feedId: {
+        source: {
+          id: {
+            [Op.eq]: 1
+          }
+        }
+      }
+    },
+    include: [
+      {
+        model: Feeds,
+        as: 'feed',
+        attributes: ['id'],
+        include: [
+          {
+            model: Sources,
+            as: 'source',
+            attributes: ['id']
+          }
+        ]
+      }
+    ],
+    limit,
+    offset: req.skip,
+    order: [['id', 'ASC']]
+  })
+    .then(results => {
+      const itemCount = results.count;
+      const pageCount = Math.ceil(results.count / limit);
+      return res.send({
+        page: results.rows,
+        currentPage: req.query.page,
+        totalPages: pageCount,
+        totalItems: itemCount
+      });
+    })
+    .catch(next);
+};
