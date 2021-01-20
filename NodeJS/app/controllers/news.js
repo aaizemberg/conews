@@ -367,6 +367,7 @@ exports.trends = async (req, res) => {
     }
   );
   let response = [];
+  let max_times = 0;
   for (let i = 0; i < news.length; i++) {
     const title = news[i].title
       .replace(',', '')
@@ -378,6 +379,9 @@ exports.trends = async (req, res) => {
       let words_obj = {};
       for (let j = 0; j < words_arr.length; j++) {
         words_obj = { ...words_obj, [words_arr[j]]: title.split(`${words_arr[j]}`).length - 1 };
+        if (words_obj[words_arr[j]] > max_times) {
+          max_times = words_obj[words_arr[j]];
+        }
       }
       response = [...response, { publication_date: news[i].publication_date, ...words_obj }];
     } else {
@@ -387,9 +391,21 @@ exports.trends = async (req, res) => {
           ...previous_obj,
           [words_arr[j]]: previous_obj[words_arr[j]] + title.split(` ${words_arr[j]} `).length - 1
         };
+        if (previous_obj[words_arr[j]] > max_times) {
+          max_times = previous_obj[words_arr[j]];
+        }
       }
       response[response.length - 1] = previous_obj;
     }
+  }
+  for (let i = 0; i < response.length; i++) {
+    let obj = response[i];
+    const keys = Object.keys(obj);
+    for (let j = 1; j < keys.length; j++) {
+      // eslint-disable-next-line no-extra-parens
+      obj = { ...obj, [keys[j]]: Math.round((obj[keys[j]] / max_times) * 100) };
+    }
+    response[i] = obj;
   }
   return res.send(response);
 };
