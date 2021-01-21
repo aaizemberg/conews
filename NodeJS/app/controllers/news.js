@@ -1,3 +1,4 @@
+// eslint-disable-next-line max-lines
 const { getNews } = require('../services/googleNews'),
   logger = require('../logger'),
   // schedule = require('node-schedule'),
