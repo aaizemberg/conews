@@ -307,22 +307,22 @@ exports.wordcloud = async (req, res) => {
     let found = false;
     for (let j = 0; j < titleWords.length; j++) {
       if (response.length === 0) {
-        response = [{ word: titleWords[j], s: 1 }];
+        response = [{ word: titleWords[j], word_count: 1 }];
       }
       found = false;
       for (let k = 0; k < response.length; k++) {
         if (response[k].word === titleWords[j]) {
-          response[k] = { word: response[k].word, s: response[k].s + 1 };
+          response[k] = { word: response[k].word, word_count: response[k].word_count + 1 };
           found = true;
           break;
         }
       }
       if (!found) {
-        response = [...response, { word: titleWords[j], s: 1 }];
+        response = [...response, { word: titleWords[j], word_count: 1 }];
       }
     }
   }
-  response.sort((a, b) => b.s - a.s);
+  response.sort((a, b) => b.word_count - a.word_count);
   const stopwords = [
     'de',
     'la',
