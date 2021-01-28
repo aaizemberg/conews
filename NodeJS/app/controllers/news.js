@@ -329,6 +329,7 @@ exports.wordcloud = async (req, res) => {
   allStopwords = [...allStopwords, ...queryStopwords];
   response = response.filter(item => !allStopwords.includes(item.word));
   response = response.slice(0, limit);
+  logger.info(`Limit: ${limit}`);
   return res.send(success(response));
 };
 
