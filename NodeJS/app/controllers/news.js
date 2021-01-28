@@ -2,7 +2,7 @@
 const { getNews } = require('../services/googleNews'),
   logger = require('../logger'),
   // schedule = require('node-schedule'),
-  { News, Feeds, Sources } = require('../models'),
+  { News, Feeds, Sources, Stopwords } = require('../models'),
   Sequelize = require('sequelize'),
   { Op } = require('sequelize'),
   { getDate, success } = require('./utils'),
@@ -276,7 +276,7 @@ exports.search = (req, res, next) => {
 // eslint-disable-next-line complexity
 exports.wordcloud = async (req, res) => {
   logger.info('Word cloud...');
-  const { d_from, d_to, words, sources, limit } = req.query;
+  const { d_from, d_to, words, sources, limit, stopwords } = req.query;
   const sources_arr = sources ? sources.split(',') : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
   const news = await db.sequelize.query(
     '\
@@ -323,23 +323,11 @@ exports.wordcloud = async (req, res) => {
     }
   }
   response.sort((a, b) => b.word_count - a.word_count);
-  const stopwords = [
-    'de',
-    'la',
-    'en',
-    'y',
-    'el',
-    'a',
-    'del',
-    'que',
-    'un',
-    'los',
-    'para',
-    'con',
-    'por',
-    'una'
-  ];
-  response = response.filter(item => !stopwords.includes(item.word));
+  let allStopwords = await Stopwords.findAll();
+  allStopwords = allStopwords.map(s => s.word);
+  const queryStopwords = stopwords ? stopwords.split(',') : [];
+  allStopwords = [...allStopwords, ...queryStopwords];
+  response = response.filter(item => !allStopwords.includes(item.word));
   response = response.slice(0, limit);
   return res.send(success(response));
 };
@@ -409,4 +397,11 @@ exports.trends = async (req, res) => {
     response[i] = obj;
   }
   return res.send(response);
+};
+
+exports.insertStopword = async (req, res) => {
+  await Stopwords.create({
+    word: req.query.word
+  });
+  return res.send('Ok, inserted stopword');
 };
