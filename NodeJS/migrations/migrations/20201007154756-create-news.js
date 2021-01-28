@@ -1,3 +1,4 @@
+/* eslint-disable new-cap */
 'use strict';
 module.exports = {
   up: (queryInterface, Sequelize) =>
@@ -13,15 +14,15 @@ module.exports = {
         allowNull: false
       },
       summary: {
-        type: Sequelize.STRING,
-        allowNull: false
+        type: Sequelize.STRING(1000),
+        allowNull: true
       },
       url: {
         type: Sequelize.STRING,
         allowNull: false
       },
       content: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(1000),
         allowNull: true
       },
       publicationDate: {

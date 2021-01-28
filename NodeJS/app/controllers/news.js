@@ -5,7 +5,7 @@ const { getNews } = require('../services/googleNews'),
   { News, Feeds, Sources, Stopwords } = require('../models'),
   Sequelize = require('sequelize'),
   { Op } = require('sequelize'),
-  { getDate, success } = require('./utils'),
+  { getDate, success, getCurrentDate } = require('./utils'),
   db = require('../models');
 
 exports.getPeriodicNews = (req, res, next) => {
@@ -288,8 +288,8 @@ exports.wordcloud = async (req, res) => {
   ORDER BY "News"."id" ASC',
     {
       replacements: {
-        d_from: d_from ? d_from : '2000-01-01',
-        d_to: d_to ? d_to : '2100-01-01',
+        d_from: d_from ? d_from : getCurrentDate(),
+        d_to: d_to ? d_to : getCurrentDate(),
         words: words ? `% ${words} %` : '%',
         sources: sources_arr
       },
