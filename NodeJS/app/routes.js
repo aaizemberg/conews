@@ -31,6 +31,7 @@ exports.init = app => {
   app.get('/medios', getSources);
   // TODO: Para todos los endpoints, podriamos hacer que si no le aclaro fechas, que me tire solamente las noticias del dia actual
   // Resuelto: En tendencias, agregar la cantidad de veces que aparece para hacer debugging. RESUELTO: en lugar de agregar el campo, comento el ultimo for y me muestra la cantidad
+  // Resuelto: Agregar tabla de stopwords. Ademas para las stopwords, agregar que el usuario pueda pasarlo en la query
   app.get('/cantidad-de-noticias', getNewsQuantitySQL);
   app.get('/heatmap', heatmapSQL);
   app.get('/busqueda', searchSQL);
