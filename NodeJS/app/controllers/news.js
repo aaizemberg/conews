@@ -58,8 +58,8 @@ exports.getNewsQuantitySQL = async (req, res) => {
   ORDER BY "News"."publicationDate" DESC',
     {
       replacements: {
-        d_from: d_from ? d_from : '2000-01-01',
-        d_to: d_to ? d_to : '2100-01-01',
+        d_from: d_from ? d_from : getCurrentDate(),
+        d_to: d_to ? d_to : getCurrentDate(),
         words: words ? `%${words}%` : '%',
         sources: sources_arr
       },
@@ -76,8 +76,8 @@ exports.getNewsQuantity = (req, res, next) => {
     where: {
       publicationDate: {
         [Op.ne]: null,
-        [Op.gt]: d_from ? new Date(d_from) : new Date('2000-01-01'),
-        [Op.lte]: d_to ? new Date(d_to) : new Date('2100-01-01')
+        [Op.gt]: d_from ? new Date(d_from) : new Date(getCurrentDate()),
+        [Op.lte]: d_to ? new Date(d_to) : new Date(getCurrentDate())
       },
       title: {
         [Op.like]: words ? `%${words}%` : '%'
@@ -112,8 +112,8 @@ exports.heatmapSQL = async (req, res) => {
   ORDER BY "News"."publicationDate" DESC',
     {
       replacements: {
-        d_from: d_from ? d_from : '2000-01-01',
-        d_to: d_to ? d_to : '2100-01-01',
+        d_from: d_from ? d_from : getCurrentDate(),
+        d_to: d_to ? d_to : getCurrentDate(),
         words: words ? `%${words}%` : '%',
         sources: sources_arr
       },
@@ -130,8 +130,8 @@ exports.heatmap = (req, res, next) => {
     where: {
       publicationDate: {
         [Op.ne]: null,
-        [Op.gt]: d_from ? new Date(d_from) : new Date('2000-01-01'),
-        [Op.lte]: d_to ? new Date(d_to) : new Date('2100-01-01')
+        [Op.gt]: d_from ? new Date(d_from) : new Date(getCurrentDate()),
+        [Op.lte]: d_to ? new Date(d_to) : new Date(getCurrentDate())
       },
       title: {
         [Op.like]: words ? `%${words}%` : '%'
@@ -180,8 +180,8 @@ exports.searchSQL = async (req, res) => {
   FETCH NEXT (:limit) ROWS ONLY',
     {
       replacements: {
-        d_from: d_from ? d_from : '2000-01-01',
-        d_to: d_to ? d_to : '2100-01-01',
+        d_from: d_from ? d_from : getCurrentDate(),
+        d_to: d_to ? d_to : getCurrentDate(),
         words: words ? `% ${words} %` : '%',
         sources: sources_arr,
         offset: (page - 1) * limit,
@@ -209,8 +209,8 @@ exports.wordtree = async (req, res) => {
   FETCH NEXT (:limit) ROWS ONLY',
     {
       replacements: {
-        d_from: d_from ? d_from : '2000-01-01',
-        d_to: d_to ? d_to : '2100-01-01',
+        d_from: d_from ? d_from : getCurrentDate(),
+        d_to: d_to ? d_to : getCurrentDate(),
         words: words ? `% ${words} %` : '%',
         sources: sources_arr,
         offset: (page - 1) * limit,
@@ -228,8 +228,8 @@ exports.search = (req, res, next) => {
     where: {
       publicationDate: {
         [Op.ne]: null,
-        [Op.gt]: d_from ? new Date(d_from) : new Date('2000-01-01'),
-        [Op.lte]: d_to ? new Date(d_to) : new Date('2100-01-01')
+        [Op.gt]: d_from ? new Date(d_from) : new Date(getCurrentDate()),
+        [Op.lte]: d_to ? new Date(d_to) : new Date(getCurrentDate())
       },
       title: {
         [Op.like]: words ? `% ${words} %` : '%'
@@ -348,8 +348,8 @@ exports.trends = async (req, res) => {
   ORDER BY "News"."publicationDate" ASC',
     {
       replacements: {
-        d_from: d_from ? d_from : '2000-01-01',
-        d_to: d_to ? d_to : '2100-01-01',
+        d_from: d_from ? d_from : getCurrentDate(),
+        d_to: d_to ? d_to : getCurrentDate(),
         sources: sources_arr
       },
       type: db.sequelize.QueryTypes.SELECT
