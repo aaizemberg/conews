@@ -1,10 +1,11 @@
+/* eslint-disable max-statements */
 /* eslint-disable max-lines */
 const { getNews } = require('../services/googleNews'),
   logger = require('../logger'),
   // schedule = require('node-schedule'),
   { News, Feeds, Sources, Stopwords } = require('../models'),
   Sequelize = require('sequelize'),
-  { Op } = require('sequelize'),
+  { Op, sequelize } = require('sequelize'),
   { getDate, success, getCurrentDate } = require('./utils'),
   db = require('../models');
 
@@ -53,14 +54,14 @@ exports.getNewsQuantitySQL = async (req, res) => {
   FROM "News" INNER JOIN "Feeds" ON "News"."feedId"="Feeds"."id" \
   INNER JOIN "Sources" ON "Feeds"."sourceId"="Sources"."id" \
   WHERE "News"."publicationDate" IS NOT NULL AND "News"."publicationDate" >= (:d_from) \
-  AND "News"."publicationDate" <= (:d_to) AND "News"."title" LIKE (:words) AND "Sources"."id" IN (:sources)\
+  AND "News"."publicationDate" <= (:d_to) AND LOWER("News"."title") LIKE (:words) AND "Sources"."id" IN (:sources)\
   GROUP BY "News"."publicationDate"\
   ORDER BY "News"."publicationDate" DESC',
     {
       replacements: {
         d_from: d_from ? d_from : getCurrentDate(),
         d_to: d_to ? d_to : getCurrentDate(),
-        words: words ? `%${words}%` : '%',
+        words: words ? `%${words.toLowerCase()}%` : '%',
         sources: sources_arr
       },
       type: db.sequelize.QueryTypes.SELECT
@@ -107,14 +108,14 @@ exports.heatmapSQL = async (req, res) => {
   FROM "News" INNER JOIN "Feeds" ON "News"."feedId"="Feeds"."id" \
   INNER JOIN "Sources" ON "Feeds"."sourceId"="Sources"."id" \
   WHERE "News"."publicationDate" IS NOT NULL AND "News"."publicationDate" >= (:d_from) \
-  AND "News"."publicationDate" <= (:d_to) AND "News"."title" LIKE (:words) AND "Sources"."id" IN (:sources)\
+  AND "News"."publicationDate" <= (:d_to) AND LOWER("News"."title") LIKE (:words) AND "Sources"."id" IN (:sources)\
   GROUP BY "News"."publicationDate", "Sources"."name"\
   ORDER BY "News"."publicationDate" DESC',
     {
       replacements: {
         d_from: d_from ? d_from : getCurrentDate(),
         d_to: d_to ? d_to : getCurrentDate(),
-        words: words ? `%${words}%` : '%',
+        words: words ? `%${words.toLowerCase()}%` : '%',
         sources: sources_arr
       },
       type: db.sequelize.QueryTypes.SELECT
@@ -174,7 +175,7 @@ exports.searchSQL = async (req, res) => {
   FROM "News" INNER JOIN "Feeds" ON "News"."feedId"="Feeds"."id" \
   INNER JOIN "Sources" ON "Feeds"."sourceId"="Sources"."id" \
   WHERE "News"."publicationDate" IS NOT NULL AND "News"."publicationDate" >= (:d_from) \
-  AND "News"."publicationDate" <= (:d_to) AND "News"."title" LIKE (:words) AND "Sources"."id" IN (:sources)\
+  AND "News"."publicationDate" <= (:d_to) AND LOWER("News"."title") LIKE (:words) AND "Sources"."id" IN (:sources)\
   ORDER BY "News"."id" ASC\
   OFFSET (:offset) ROWS\
   FETCH NEXT (:limit) ROWS ONLY',
@@ -182,7 +183,7 @@ exports.searchSQL = async (req, res) => {
       replacements: {
         d_from: d_from ? d_from : getCurrentDate(),
         d_to: d_to ? d_to : getCurrentDate(),
-        words: words ? `% ${words} %` : '%',
+        words: words ? `%${words.toLowerCase()}%` : '%',
         sources: sources_arr,
         offset: (page - 1) * limit,
         limit
@@ -203,7 +204,7 @@ exports.wordtree = async (req, res) => {
   FROM "News" INNER JOIN "Feeds" ON "News"."feedId"="Feeds"."id" \
   INNER JOIN "Sources" ON "Feeds"."sourceId"="Sources"."id" \
   WHERE "News"."publicationDate" IS NOT NULL AND "News"."publicationDate" >= (:d_from) \
-  AND "News"."publicationDate" <= (:d_to) AND "News"."title" LIKE (:words) AND "Sources"."id" IN (:sources)\
+  AND "News"."publicationDate" <= (:d_to) AND LOWER("News"."title") LIKE (:words) AND "Sources"."id" IN (:sources)\
   ORDER BY "News"."id" ASC\
   OFFSET (:offset) ROWS\
   FETCH NEXT (:limit) ROWS ONLY',
@@ -211,7 +212,7 @@ exports.wordtree = async (req, res) => {
       replacements: {
         d_from: d_from ? d_from : getCurrentDate(),
         d_to: d_to ? d_to : getCurrentDate(),
-        words: words ? `% ${words} %` : '%',
+        words: words ? `%${words.toLowerCase()}%` : '%',
         sources: sources_arr,
         offset: (page - 1) * limit,
         limit
@@ -284,13 +285,13 @@ exports.wordcloud = async (req, res) => {
   FROM "News" INNER JOIN "Feeds" ON "News"."feedId"="Feeds"."id" \
   INNER JOIN "Sources" ON "Feeds"."sourceId"="Sources"."id" \
   WHERE "News"."publicationDate" IS NOT NULL AND "News"."publicationDate" >= (:d_from) \
-  AND "News"."publicationDate" <= (:d_to) AND "News"."title" LIKE (:words) AND "Sources"."id" IN (:sources)\
+  AND "News"."publicationDate" <= (:d_to) AND LOWER("News"."title") LIKE (:words) AND "Sources"."id" IN (:sources)\
   ORDER BY "News"."id" ASC',
     {
       replacements: {
         d_from: d_from ? d_from : getCurrentDate(),
         d_to: d_to ? d_to : getCurrentDate(),
-        words: words ? `% ${words} %` : '%',
+        words: words ? `%${words.toLowerCase()}%` : '%',
         sources: sources_arr
       },
       type: db.sequelize.QueryTypes.SELECT
@@ -299,6 +300,7 @@ exports.wordcloud = async (req, res) => {
   let response = [];
   for (let i = 0; i < news.length; i++) {
     const title = news[i].title
+      .toLowerCase()
       .replace(',', '')
       .replace(':', '')
       .replace('"', '')
@@ -338,7 +340,8 @@ exports.trends = async (req, res) => {
   logger.info('Tendencias...');
   const { d_from, d_to, words, sources } = req.query;
   const sources_arr = sources ? sources.split(',') : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
-  const words_arr = words ? words.split(',') : [];
+  let words_arr = words ? words.split(',') : [];
+  words_arr = words_arr.map(word => word.toLowerCase());
   const news = await db.sequelize.query(
     '\
   SELECT "News"."title", "News"."publicationDate" AS "publication_date" \
@@ -360,6 +363,7 @@ exports.trends = async (req, res) => {
   let max_times = 0;
   for (let i = 0; i < news.length; i++) {
     const title = news[i].title
+      .toLowerCase()
       .replace(',', '')
       .replace(':', '')
       .replace('"', '')
@@ -379,7 +383,7 @@ exports.trends = async (req, res) => {
       for (let j = 0; j < words_arr.length; j++) {
         previous_obj = {
           ...previous_obj,
-          [words_arr[j]]: previous_obj[words_arr[j]] + title.split(` ${words_arr[j]} `).length - 1
+          [words_arr[j]]: previous_obj[words_arr[j]] + title.split(`${words_arr[j]}`).length - 1
         };
         if (previous_obj[words_arr[j]] > max_times) {
           max_times = previous_obj[words_arr[j]];
