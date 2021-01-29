@@ -9,7 +9,7 @@ const {
     getLastPubdate
   } = require('./controllers/googleNews'),
   { insertSources, getSources } = require('./controllers/sources'),
-  { insertFeeds } = require('./controllers/feeds'),
+  { insertFeeds, getFeeds } = require('./controllers/feeds'),
   {
     getPeriodicNews,
     getNewsQuantitySQL,
@@ -29,9 +29,12 @@ exports.init = app => {
   app.post('/insert-feeds', insertFeeds);
   app.get('/periodic-news', getPeriodicNews);
   app.get('/medios', getSources);
+  app.get('/feeds', getFeeds);
   // Resuelto: Para todos los endpoints, podriamos hacer que si no le aclaro fechas, que me tire solamente las noticias del dia actual
   // Resuelto: En tendencias, agregar la cantidad de veces que aparece para hacer debugging. RESUELTO: en lugar de agregar el campo, comento el ultimo for y me muestra la cantidad
   // Resuelto: Agregar tabla de stopwords. Ademas para las stopwords, agregar que el usuario pueda pasarlo en la query
+  // Resuelto: ver todas las palabras en lowercase, para todos los endpoints
+  // Resuelto: Hacer que funcione para todos los medios en que este disponible el RSS, y que sea tarea periodica
   app.get('/cantidad-de-noticias', getNewsQuantitySQL);
   app.get('/heatmap', heatmapSQL);
   app.get('/busqueda', searchSQL);

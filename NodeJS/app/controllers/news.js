@@ -1,47 +1,51 @@
+/* eslint-disable max-lines */
 /* eslint-disable max-statements */
 /* eslint-disable max-lines */
 const { getNews } = require('../services/googleNews'),
   logger = require('../logger'),
-  // schedule = require('node-schedule'),
+  schedule = require('node-schedule'),
   { News, Feeds, Sources, Stopwords } = require('../models'),
   Sequelize = require('sequelize'),
-  { Op, sequelize } = require('sequelize'),
+  { Op } = require('sequelize'),
   { getDate, success, getCurrentDate } = require('./utils'),
   db = require('../models');
 
 exports.getPeriodicNews = (req, res, next) => {
-  // schedule.scheduleJob('0 * * * *', () => {
-  logger.info('Getting news...');
-  return Feeds.findAll()
-    .then(async feeds => {
-      for (let i = 0; i < /* feeds.length*/ 112; i++) {
-        // hasta ambito incluido funciona bien, despues de eso tira errores
-        const response = await getNews([feeds[i].url]);
-        response.items.map(async item => {
-          const news = await News.findOne({
-            where: {
-              url: item.link
-            }
-          });
-          // TODO: Agregar el title como PK
-          if (!news) {
-            const { title, link, pubDate, content } = item;
-            await News.create({
-              title,
-              summary: content,
-              url: link,
-              publicationDate: getDate(new Date(pubDate)),
-              content,
-              feedId: feeds[i].id
+  schedule.scheduleJob('0 * * * *', () => {
+    logger.info('Getting news...');
+    return Feeds.findAll()
+      .then(async feeds => {
+        for (let i = 0; i < feeds.length; i++) {
+          try {
+            const response = await getNews([feeds[i].url]);
+            response.items.map(async item => {
+              const news = await News.findOne({
+                where: {
+                  url: item.link,
+                  title: item.title
+                }
+              });
+              if (!news) {
+                const { title, link, pubDate, content } = item;
+                await News.create({
+                  title,
+                  summary: content,
+                  url: link,
+                  publicationDate: getDate(new Date(pubDate)),
+                  content,
+                  feedId: feeds[i].id
+                });
+              }
             });
+          } catch (error) {
+            logger.info(error);
           }
-        });
-      }
-      return res.send('OK');
-    })
-    .catch(next);
-  // });
-  // return res.send('Schedule created!');
+        }
+        return res.send('OK');
+      })
+      .catch(next);
+  });
+  return res.send('Schedule created!');
 };
 
 exports.getNewsQuantitySQL = async (req, res) => {
@@ -327,7 +331,7 @@ exports.wordcloud = async (req, res) => {
   response.sort((a, b) => b.word_count - a.word_count);
   let allStopwords = await Stopwords.findAll();
   allStopwords = allStopwords.map(s => s.word);
-  const queryStopwords = stopwords ? stopwords.split(',') : [];
+  const queryStopwords = stopwords ? stopwords.split(',').map(word => word.toLowerCase()) : [];
   allStopwords = [...allStopwords, ...queryStopwords];
   response = response.filter(item => !allStopwords.includes(item.word));
   response = response.slice(0, limit);

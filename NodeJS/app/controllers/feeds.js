@@ -1,6 +1,7 @@
 const { Sources, Feeds } = require('../models'),
   { SOURCES } = require('./constants'),
-  logger = require('../logger');
+  logger = require('../logger'),
+  { success } = require('./utils');
 
 exports.insertFeeds = async (req, res) => {
   for (let i = 0; i < SOURCES.length; i++) {
@@ -23,3 +24,8 @@ exports.insertFeeds = async (req, res) => {
   }
   return res.send('OK, Feeds inserted');
 };
+
+exports.getFeeds = (req, res, next) =>
+  Feeds.findAll()
+    .then(feeds => res.send(success(feeds)))
+    .catch(next);
