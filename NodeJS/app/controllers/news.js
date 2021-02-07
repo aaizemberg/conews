@@ -11,49 +11,49 @@ const { getNews } = require('../services/googleNews'),
   db = require('../models');
 
 exports.getPeriodicNews = (req, res, next) => {
-  // schedule.scheduleJob('0 * * * *', () => {
-  logger.info('Getting news...');
-  return Feeds.findAll()
-    .then(async feeds => {
-      for (let i = 0; i < feeds.length; i++) {
-        try {
-          const response = await getNews([feeds[i].url]);
-          await Feeds.update(
-            {
-              lastUpdate: getCurrentDate()
-            },
-            {
-              where: { url: feeds[i].url }
-            }
-          );
-          response.items.map(async item => {
-            const news = await News.findOne({
-              where: {
-                url: item.link,
-                title: item.title
+  schedule.scheduleJob('0 * * * *', () => {
+    logger.info('Getting news...');
+    return Feeds.findAll()
+      .then(async feeds => {
+        for (let i = 0; i < feeds.length; i++) {
+          try {
+            const response = await getNews([feeds[i].url]);
+            await Feeds.update(
+              {
+                lastUpdate: getCurrentDate()
+              },
+              {
+                where: { url: feeds[i].url }
+              }
+            );
+            response.items.map(async item => {
+              const news = await News.findOne({
+                where: {
+                  url: item.link,
+                  title: item.title
+                }
+              });
+              if (!news) {
+                const { title, link, pubDate, content } = item;
+                await News.create({
+                  title,
+                  summary: content,
+                  url: link,
+                  publicationDate: getDate(new Date(pubDate)),
+                  content,
+                  feedId: feeds[i].id
+                });
               }
             });
-            if (!news) {
-              const { title, link, pubDate, content } = item;
-              await News.create({
-                title,
-                summary: content,
-                url: link,
-                publicationDate: getDate(new Date(pubDate)),
-                content,
-                feedId: feeds[i].id
-              });
-            }
-          });
-        } catch (error) {
-          logger.info(error);
+          } catch (error) {
+            logger.info(error);
+          }
         }
-      }
-      return res.send('OK');
-    })
-    .catch(next);
-  // });
-  // return res.send('Schedule created!');
+        return res.send('OK');
+      })
+      .catch(next);
+  });
+  return res.send('Schedule created!');
 };
 
 exports.getNewsQuantitySQL = async (req, res) => {
