@@ -15,6 +15,10 @@ module.exports = (sequelize, Sequelize) => {
       sourceId: {
         type: Sequelize.INTEGER,
         allowNull: true
+      },
+      lastUpdate: {
+        type: Sequelize.DATEONLY,
+        allowNull: true
       }
     },
     {}

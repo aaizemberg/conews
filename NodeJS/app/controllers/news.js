@@ -11,41 +11,49 @@ const { getNews } = require('../services/googleNews'),
   db = require('../models');
 
 exports.getPeriodicNews = (req, res, next) => {
-  schedule.scheduleJob('0 * * * *', () => {
-    logger.info('Getting news...');
-    return Feeds.findAll()
-      .then(async feeds => {
-        for (let i = 0; i < feeds.length; i++) {
-          try {
-            const response = await getNews([feeds[i].url]);
-            response.items.map(async item => {
-              const news = await News.findOne({
-                where: {
-                  url: item.link,
-                  title: item.title
-                }
-              });
-              if (!news) {
-                const { title, link, pubDate, content } = item;
-                await News.create({
-                  title,
-                  summary: content,
-                  url: link,
-                  publicationDate: getDate(new Date(pubDate)),
-                  content,
-                  feedId: feeds[i].id
-                });
+  // schedule.scheduleJob('0 * * * *', () => {
+  logger.info('Getting news...');
+  return Feeds.findAll()
+    .then(async feeds => {
+      for (let i = 0; i < feeds.length; i++) {
+        try {
+          const response = await getNews([feeds[i].url]);
+          await Feeds.update(
+            {
+              lastUpdate: getCurrentDate()
+            },
+            {
+              where: { url: feeds[i].url }
+            }
+          );
+          response.items.map(async item => {
+            const news = await News.findOne({
+              where: {
+                url: item.link,
+                title: item.title
               }
             });
-          } catch (error) {
-            logger.info(error);
-          }
+            if (!news) {
+              const { title, link, pubDate, content } = item;
+              await News.create({
+                title,
+                summary: content,
+                url: link,
+                publicationDate: getDate(new Date(pubDate)),
+                content,
+                feedId: feeds[i].id
+              });
+            }
+          });
+        } catch (error) {
+          logger.info(error);
         }
-        return res.send('OK');
-      })
-      .catch(next);
-  });
-  return res.send('Schedule created!');
+      }
+      return res.send('OK');
+    })
+    .catch(next);
+  // });
+  // return res.send('Schedule created!');
 };
 
 exports.getNewsQuantitySQL = async (req, res) => {
@@ -342,7 +350,7 @@ exports.wordcloud = async (req, res) => {
 // eslint-disable-next-line complexity
 exports.trends = async (req, res) => {
   logger.info('Tendencias...');
-  const { d_from, d_to, words, sources } = req.query;
+  const { d_from, d_to, words, sources, debug } = req.query;
   const sources_arr = sources ? sources.split(',') : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
   let words_arr = words ? words.split(',') : [];
   words_arr = words_arr.map(word => word.toLowerCase());
@@ -396,14 +404,16 @@ exports.trends = async (req, res) => {
       response[response.length - 1] = previous_obj;
     }
   }
-  for (let i = 0; i < response.length; i++) {
-    let obj = response[i];
-    const keys = Object.keys(obj);
-    for (let j = 1; j < keys.length; j++) {
-      // eslint-disable-next-line no-extra-parens
-      obj = { ...obj, [keys[j]]: Math.round((obj[keys[j]] / max_times) * 100) };
+  if (debug !== 'true') {
+    for (let i = 0; i < response.length; i++) {
+      let obj = response[i];
+      const keys = Object.keys(obj);
+      for (let j = 1; j < keys.length; j++) {
+        // eslint-disable-next-line no-extra-parens
+        obj = { ...obj, [keys[j]]: Math.round((obj[keys[j]] / max_times) * 100) };
+      }
+      response[i] = obj;
     }
-    response[i] = obj;
   }
   return res.send(response);
 };

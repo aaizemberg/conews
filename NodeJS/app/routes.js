@@ -30,8 +30,8 @@ exports.init = app => {
   app.get('/periodic-news', getPeriodicNews);
   app.get('/medios', getSources);
   app.get('/feeds', getFeeds);
-  // TODO: En tendencias, agregar parametro debug true y en ese caso que devuelva las cantidades y no los porcentajes
-  // TODO: Para cada RSS, agregar la ultima vez que se obtuvieron noticias del mismo
+  // Resuelto: En tendencias, agregar parametro debug true y en ese caso que devuelva las cantidades y no los porcentajes
+  // Resuelto: Para cada RSS, agregar la ultima vez que se obtuvieron noticias del mismo
   // TODO: Armar en observable algunos graficos para verificar el correcto funcionamiento de la API. Para cada endpoint poner un par de visualizaciones
   app.get('/cantidad-de-noticias', getNewsQuantitySQL);
   app.get('/heatmap', heatmapSQL);

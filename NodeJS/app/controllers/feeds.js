@@ -26,6 +26,6 @@ exports.insertFeeds = async (req, res) => {
 };
 
 exports.getFeeds = (req, res, next) =>
-  Feeds.findAll()
+  Feeds.findAll({ order: [['id', 'ASC']] })
     .then(feeds => res.send(success(feeds)))
     .catch(next);
