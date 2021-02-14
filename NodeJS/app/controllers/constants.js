@@ -39,6 +39,51 @@ exports.SOURCES = [
     id: 7,
     name: 'Cronista',
     url: 'https://www.cronista.com'
+  },
+  {
+    id: 8,
+    name: 'MDZOL',
+    url: 'https://www.mdzol.com'
+  },
+  {
+    id: 9,
+    name: 'La Voz',
+    url: 'https://www.lavoz.com.ar'
+  },
+  {
+    id: 10,
+    name: 'Los Andes',
+    url: 'https://www.losandes.com.ar'
+  },
+  {
+    id: 11,
+    name: 'Destape Web',
+    url: 'https://www.eldestapeweb.com'
+  },
+  {
+    id: 12,
+    name: 'Diario Uno',
+    url: 'https://www.diariouno.com.ar'
+  },
+  {
+    id: 13,
+    name: 'BAE Negocios',
+    url: 'https://www.baenegocios.com'
+  },
+  {
+    id: 14,
+    name: 'Cadena 3',
+    url: 'https://www.cadena3.com'
+  },
+  {
+    id: 15,
+    name: 'A24',
+    url: 'https://www.a24.com'
+  },
+  {
+    id: 16,
+    name: 'Cronica',
+    url: 'https://www.cronica.com.ar'
   }
 ];
 

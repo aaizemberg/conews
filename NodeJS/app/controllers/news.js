@@ -5,7 +5,7 @@
 /* eslint-disable max-lines */
 const { getNews } = require('../services/googleNews'),
   logger = require('../logger'),
-  schedule = require('node-schedule'),
+  // schedule = require('node-schedule'),
   { News, Sources, Stopwords } = require('../models'),
   { getDate, success, getCurrentDate } = require('./utils'),
   { DEFAULT_ARRAY } = require('./constants'),

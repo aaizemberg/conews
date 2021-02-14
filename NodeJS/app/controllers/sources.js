@@ -13,7 +13,4 @@ exports.insertSources = async (req, res) => {
   return res.send('OK, Sources inserted');
 };
 
-exports.getSources = (req, res, next) =>
-  Sources.findAll().then(sources =>
-    res.send(success(sources.map(source => ({ id: source.id, source: source.name })))).catch(next)
-  );
+exports.getSources = (req, res) => Sources.findAll().then(sources => res.send(success(sources)));
