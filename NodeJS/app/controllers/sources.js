@@ -4,9 +4,10 @@ const { Sources } = require('../models'),
 
 exports.insertSources = async (req, res) => {
   for (let i = 0; i < SOURCES.length; i++) {
-    const sourceName = SOURCES[i].name;
+    const { name, url } = SOURCES[i];
     await Sources.create({
-      name: sourceName
+      name,
+      url
     });
   }
   return res.send('OK, Sources inserted');

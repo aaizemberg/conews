@@ -7,14 +7,22 @@ module.exports = (sequelize, Sequelize) => {
       name: {
         type: Sequelize.STRING,
         allowNull: false
+      },
+      url: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      lastUpdate: {
+        type: Sequelize.DATEONLY,
+        allowNull: true
       }
     },
     {}
   );
   Sources.associate = models => {
-    Sources.hasMany(models.Feeds, {
+    Sources.hasMany(models.News, {
       foreignKey: 'sourceId',
-      as: 'feeds'
+      as: 'news'
     });
   };
   return Sources;

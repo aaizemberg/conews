@@ -29,7 +29,7 @@ module.exports = {
         type: Sequelize.DATEONLY,
         allowNull: true
       },
-      feedId: {
+      sourceId: {
         type: Sequelize.INTEGER,
         allowNull: true
       },

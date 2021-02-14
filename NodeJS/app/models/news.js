@@ -25,7 +25,7 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.DATEONLY,
         allowNull: true
       },
-      feedId: {
+      sourceId: {
         type: Sequelize.INTEGER,
         allowNull: true
       }
@@ -33,9 +33,9 @@ module.exports = (sequelize, Sequelize) => {
     {}
   );
   News.associate = models => {
-    News.belongsTo(models.Feeds, {
-      foreignKey: 'feedId',
-      as: 'feed'
+    News.belongsTo(models.Sources, {
+      foreignKey: 'sourceId',
+      as: 'source'
     });
     News.belongsToMany(models.Entities, {
       through: 'EntitiesNews',
