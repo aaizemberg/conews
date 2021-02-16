@@ -1,0 +1,350 @@
+{
+   "swagger": "2.0",
+   "info": {
+     "title": "News API",
+     "description": "Repository: https://github.com/aaizemberg/conews ",
+     "version": "v1"
+   },
+   "host": "newsapi.it.itba.edu.ar",
+   "schemes": [
+     "https"
+   ],
+   "basePath": "/",
+   "consumes": [
+     "application/json"
+   ],
+   "produces": [
+     "application/json"
+   ],
+   "securityDefinitions": {
+     "Basic": {
+       "type": "basic"
+     }
+   },
+   "security": [
+     {
+       "Basic": []
+     }
+   ],
+   "paths": {
+      "/medios": {
+         "get": {
+           "operationId": "medios",
+           "description": "Devuelve los medios que se encuentran registrados en la base de datos para ser consultados.",
+           "parameters": [],
+           "responses": {
+             "200": {
+               "description": ""
+             }
+           },
+           "tags": [
+             "Medios"
+           ]
+         }
+      },
+      "/cantidad-de-noticias": {
+         "get": {
+           "operationId": "cantidadDeNoticias",
+           "description": "Devuelve la cantidad de noticias por fecha. Si no se especifica rango de fechas, devuelve la cantidad de noticias del día.",
+           "parameters": [
+             {
+               "name": "d_from",
+               "in": "query",
+               "description": "Fecha desde. Formato: yyyy-mm-dd",
+               "type": "string",
+               "format": "date",
+               "pattern": "\\d{4}-\\d{2}-\\d{2}"
+             },
+             {
+               "name": "d_to",
+               "in": "query",
+               "description": "Fecha hasta. Formato: yyyy-mm-dd",
+               "type": "string",
+               "format": "date",
+               "pattern": "\\d{4}-\\d{2}-\\d{2}"
+             },
+             {
+               "name": "words",
+               "in": "query",
+               "description": "Buscar noticias cuyo título contenga esta palabra",
+               "type": "string"
+             },
+             {
+               "name": "sources",
+               "in": "query",
+               "description": "Buscar noticias de los medios con estos IDs, separados por coma",
+               "type": "string"
+             }
+           ],
+           "responses": {
+             "200": {
+               "description": ""
+             }
+           },
+           "tags": [
+             "Noticias"
+           ]
+         }
+       },
+       "/heatmap": {
+         "get": {
+           "operationId": "heatmap",
+           "description": "Devuelve la cantidad de noticias por fecha y medio. Si no se especifica rango de fechas, devuelve la cantidad de noticias del día.",
+           "parameters": [
+             {
+               "name": "d_from",
+               "in": "query",
+               "description": "Fecha desde. Formato: yyyy-mm-dd",
+               "type": "string",
+               "format": "date",
+               "pattern": "\\d{4}-\\d{2}-\\d{2}"
+             },
+             {
+               "name": "d_to",
+               "in": "query",
+               "description": "Fecha hasta. Formato: yyyy-mm-dd",
+               "type": "string",
+               "format": "date",
+               "pattern": "\\d{4}-\\d{2}-\\d{2}"
+             },
+             {
+               "name": "words",
+               "in": "query",
+               "description": "Buscar noticias cuyo título contenga esta palabra",
+               "type": "string"
+             },
+             {
+               "name": "sources",
+               "in": "query",
+               "description": "Buscar noticias de los medios con estos IDs, separados por coma",
+               "type": "string"
+             }
+           ],
+           "responses": {
+             "200": {
+               "description": ""
+             }
+           },
+           "tags": [
+             "Noticias"
+           ]
+         }
+       },
+       "/busqueda": {
+         "get": {
+           "operationId": "busqueda",
+           "description": "Devuelve las noticias en la base de datos. Si no se especifica rango de fechas, devuelve las noticias del día.",
+           "parameters": [
+             {
+               "name": "d_from",
+               "in": "query",
+               "description": "Fecha desde. Formato: yyyy-mm-dd",
+               "type": "string",
+               "format": "date",
+               "pattern": "\\d{4}-\\d{2}-\\d{2}"
+             },
+             {
+               "name": "d_to",
+               "in": "query",
+               "description": "Fecha hasta. Formato: yyyy-mm-dd",
+               "type": "string",
+               "format": "date",
+               "pattern": "\\d{4}-\\d{2}-\\d{2}"
+             },
+             {
+               "name": "words",
+               "in": "query",
+               "description": "Buscar noticias cuyo título contenga esta palabra",
+               "type": "string"
+             },
+             {
+               "name": "sources",
+               "in": "query",
+               "description": "Buscar noticias de los medios con estos IDs, separados por coma",
+               "type": "string"
+             },
+             {
+               "name": "page",
+               "in": "query",
+               "description": "Número de página. El valor default es 1",
+               "type": "integer"
+             },
+             {
+               "name": "limit",
+               "in": "query",
+               "description": "Cantidad de noticias por cada página. El valor default es 20",
+               "type": "integer"
+             }
+           ],
+           "responses": {
+             "200": {
+               "description": ""
+             }
+           },
+           "tags": [
+             "Noticias"
+           ]
+         }
+       },
+       "/wordtree": {
+         "get": {
+           "operationId": "wordtree",
+           "description": "Devuelve los títulos de las noticias en la base de datos. Si no se especifica rango de fechas, devuelve los títulos de las noticias del día.",
+           "parameters": [
+             {
+               "name": "d_from",
+               "in": "query",
+               "description": "Fecha desde. Formato: yyyy-mm-dd",
+               "type": "string",
+               "format": "date",
+               "pattern": "\\d{4}-\\d{2}-\\d{2}"
+             },
+             {
+               "name": "d_to",
+               "in": "query",
+               "description": "Fecha hasta. Formato: yyyy-mm-dd",
+               "type": "string",
+               "format": "date",
+               "pattern": "\\d{4}-\\d{2}-\\d{2}"
+             },
+             {
+               "name": "words",
+               "in": "query",
+               "description": "Buscar noticias cuyo título contenga esta palabra",
+               "type": "string"
+             },
+             {
+               "name": "sources",
+               "in": "query",
+               "description": "Buscar noticias de los medios con estos IDs, separados por coma",
+               "type": "string"
+             },
+             {
+               "name": "page",
+               "in": "query",
+               "description": "Número de página. El valor default es 1",
+               "type": "integer"
+             },
+             {
+               "name": "limit",
+               "in": "query",
+               "description": "Cantidad de noticias por cada página. El valor default es 20",
+               "type": "integer"
+             }
+           ],
+           "responses": {
+             "200": {
+               "description": ""
+             }
+           },
+           "tags": [
+             "Noticias"
+           ]
+         }
+       },
+       "/nube-de-palabras": {
+         "get": {
+           "operationId": "nubeDePalabras",
+           "description": "Devuelve las palabras con más apariciones en los títulos de las noticias.",
+           "parameters": [
+             {
+               "name": "d_from",
+               "in": "query",
+               "description": "Fecha desde. Formato: yyyy-mm-dd",
+               "type": "string",
+               "format": "date",
+               "pattern": "\\d{4}-\\d{2}-\\d{2}"
+             },
+             {
+               "name": "d_to",
+               "in": "query",
+               "description": "Fecha hasta. Formato: yyyy-mm-dd",
+               "type": "string",
+               "format": "date",
+               "pattern": "\\d{4}-\\d{2}-\\d{2}"
+             },
+             {
+               "name": "words",
+               "in": "query",
+               "description": "Buscar noticias cuyo título contenga esta palabra",
+               "type": "string"
+             },
+             {
+               "name": "sources",
+               "in": "query",
+               "description": "Buscar noticias de los medios con estos IDs, separados por coma",
+               "type": "string"
+             },
+             {
+               "name": "limit",
+               "in": "query",
+               "description": "Cantidad de palabras. El valor default es 20",
+               "type": "integer"
+             },
+             {
+               "name": "stopwords",
+               "in": "query",
+               "description": "Listado de stopwords, separados por coma",
+               "type": "string"
+             }
+           ],
+           "responses": {
+             "200": {
+               "description": ""
+             }
+           },
+           "tags": [
+             "Noticias"
+           ]
+         }
+       },
+       "/tendencias": {
+         "get": {
+           "operationId": "tendencias",
+           "description": "Tendencias de las palabras por fecha, relativas al máximo en el período de fechas indicado.",
+           "parameters": [
+             {
+               "name": "d_from",
+               "in": "query",
+               "description": "Fecha desde. Formato: yyyy-mm-dd",
+               "type": "string",
+               "format": "date",
+               "pattern": "\\d{4}-\\d{2}-\\d{2}"
+             },
+             {
+               "name": "d_to",
+               "in": "query",
+               "description": "Fecha hasta. Formato: yyyy-mm-dd",
+               "type": "string",
+               "format": "date",
+               "pattern": "\\d{4}-\\d{2}-\\d{2}"
+             },
+             {
+               "name": "sources",
+               "in": "query",
+               "description": "Buscar noticias de los medios con estos IDs, separados por coma",
+               "type": "string"
+             }
+           ],
+           "responses": {
+             "200": {
+               "description": ""
+             }
+           },
+           "tags": [
+             "Noticias"
+           ]
+         },
+         "parameters": [
+            {
+              "name": "words",
+              "in": "query",
+              "description": "Palabras a comparar, separadas por coma",
+              "required": true,
+              "type": "string"
+            }
+          ]
+       }
+   },
+   "definitions": {}
+ }

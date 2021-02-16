@@ -7,6 +7,8 @@ const { expressMiddleware, expressRequestIdMiddleware } = require('express-wolox
   errors = require('./app/middlewares/errors'),
   paginate = require('express-paginate'),
   cors = require('cors'),
+  swaggerUi = require('swagger-ui-express'),
+  swaggerDocument = require('./swagger.json'),
   {
     DEFAULT_BODY_SIZE_LIMIT,
     DEFAULT_PARAMETER_LIMIT,
@@ -28,6 +30,7 @@ const bodyParserUrlencodedConfig = () => ({
 const app = express();
 
 app.use('/docs', express.static(path.join(__dirname, 'docs')));
+app.use('/api/v1/swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Client must send "Content-Type: application/json" header
 app.use(bodyParser.json(bodyParserJsonConfig()));
