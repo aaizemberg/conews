@@ -6,8 +6,6 @@ const { User } = require('../models'),
   { sendEmail } = require('./utils');
 
 exports.add = async (req, admin) => {
-  logger.info('body');
-  console.log(req.body);
   const mappedUser = await userMapper({ ...req.body, admin });
   if (admin) {
     await User.upsert(mappedUser);
