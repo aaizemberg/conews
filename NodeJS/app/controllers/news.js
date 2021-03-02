@@ -5,57 +5,56 @@
 /* eslint-disable max-lines */
 const { getNews } = require('../services/googleNews'),
   logger = require('../logger'),
-  // schedule = require('node-schedule'),
+  schedule = require('node-schedule'),
   { News, Sources, Stopwords } = require('../models'),
   { getDate, success, getCurrentDate } = require('./utils'),
   { DEFAULT_ARRAY } = require('./constants'),
   db = require('../models');
 
-exports.getPeriodicNews = (req, res, next) => {
-  // schedule.scheduleJob('0 * * * *', () => {
-  logger.info('Getting news...');
-  return Sources.findAll()
-    .then(async sources => {
-      for (let i = 0; i < sources.length; i++) {
-        try {
-          const response = await getNews([sources[i].url]);
-          await Sources.update(
-            {
-              lastUpdate: getCurrentDate()
-            },
-            {
-              where: { url: sources[i].url }
-            }
-          );
-          response.items.map(async item => {
-            const news = await News.findOne({
-              where: {
-                url: item.link,
-                title: item.title.split(' - ')[0]
+exports.getPeriodicNews = () => {
+  schedule.scheduleJob('0 * * * *', () => {
+    logger.info('Getting news...');
+    return Sources.findAll()
+      .then(async sources => {
+        for (let i = 0; i < sources.length; i++) {
+          try {
+            const response = await getNews([sources[i].url]);
+            await Sources.update(
+              {
+                lastUpdate: getCurrentDate()
+              },
+              {
+                where: { url: sources[i].url }
+              }
+            );
+            response.items.map(async item => {
+              const news = await News.findOne({
+                where: {
+                  url: item.link,
+                  title: item.title.split(' - ')[0]
+                }
+              });
+              if (!news) {
+                const { title, link, pubDate } = item;
+                const itemTitle = title.split(' - ')[0];
+                await News.create({
+                  title: itemTitle,
+                  summary: itemTitle,
+                  url: link,
+                  publicationDate: getDate(new Date(pubDate)),
+                  content: itemTitle,
+                  sourceId: sources[i].id
+                });
               }
             });
-            if (!news) {
-              const { title, link, pubDate } = item;
-              const itemTitle = title.split(' - ')[0];
-              await News.create({
-                title: itemTitle,
-                summary: itemTitle,
-                url: link,
-                publicationDate: getDate(new Date(pubDate)),
-                content: itemTitle,
-                sourceId: sources[i].id
-              });
-            }
-          });
-        } catch (error) {
-          logger.info(error);
+          } catch (error) {
+            logger.info(error);
+          }
         }
-      }
-      return res.send('OK');
-    })
-    .catch(next);
-  // });
-  // return res.send('Schedule created!');
+      })
+      .catch(error => error);
+  });
+  logger.info('Schedule created!');
 };
 
 exports.getNewsQuantitySQL = async (req, res) => {

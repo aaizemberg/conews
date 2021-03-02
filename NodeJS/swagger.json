@@ -9,7 +9,7 @@
    "schemes": [
      "https"
    ],
-   "basePath": "/",
+   "basePath": "/api/v1/",
    "consumes": [
      "application/json"
    ],
@@ -344,7 +344,59 @@
               "type": "string"
             }
           ]
-       }
+       },
+       "/login": {
+        "post": {
+          "operationId": "login",
+          "description": "Login",
+          "parameters": [
+            {
+              "name": "data",
+              "in": "body",
+              "description": "Email y Password en el body, formato JSON",
+              "type": "string"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Usuarios"
+          ]
+        },
+        "parameters": []
+      },
+      "/insert-stopword": {
+        "post": {
+          "operationId": "insertStopword",
+          "description": "Insert Stopword",
+          "parameters": [
+            {
+              "name": "authorization",
+              "in": "header",
+              "description": "Authorization token",
+              "type": "string"
+            },
+            {
+              "name": "word",
+              "in": "query",
+              "description": "Word to add to stopwords",
+              "type": "string"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Administrador"
+          ]
+        },
+        "parameters": []
+      }
    },
    "definitions": {}
  }

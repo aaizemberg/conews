@@ -25,6 +25,7 @@ module.exports = {
         type: Sequelize.STRING(1000),
         allowNull: true
       },
+      entitiesCalculated: { type: Sequelize.BOOLEAN, defaultValue: false },
       publicationDate: {
         type: Sequelize.DATEONLY,
         allowNull: true

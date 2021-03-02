@@ -5,7 +5,10 @@ exports.userSignIn = {
     errorMessage: 'Missing email',
     custom: {
       options: value =>
-        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@wolox.com.ar$/.test(value),
+        // eslint-disable-next-line max-len
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+")).com$/.test(
+          value
+        ),
       errorMessage: 'Email is not valid'
     }
   },

@@ -7,3 +7,5 @@ exports.PASSWORD_REGEXP_ERROR = 'Password must be alphanumeric';
 exports.PASSWORD_MIN_LENGTH_ERROR = 'Password must be at least 8 chars long';
 
 exports.TOKEN_START = 'Bearer ';
+
+exports.API_BASE_URL = '/api/v1';
