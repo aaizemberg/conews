@@ -36,7 +36,11 @@ app.use('/api/v1/swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use(bodyParser.json(bodyParserJsonConfig()));
 app.use(bodyParser.urlencoded(bodyParserUrlencodedConfig()));
 app.use(expressRequestIdMiddleware);
-app.use(cors());
+app.use(
+  cors({
+    exposedHeaders: ['Authorization']
+  })
+);
 app.use(paginate.middleware(PAGINATE_LIMIT, PAGINATE_MAX_LIMIT));
 
 if (!config.isTesting) {
