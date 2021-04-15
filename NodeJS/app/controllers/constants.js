@@ -13,7 +13,7 @@ exports.SOURCES = [
   {
     id: 2,
     name: 'La Nacion',
-    url: 'https://www.lanacion.com.ar/'
+    url: 'https://www.lanacion.com.ar'
   },
   {
     id: 3,
