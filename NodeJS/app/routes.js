@@ -13,10 +13,10 @@ const { getSources } = require('./controllers/sources'),
   { validateSchema } = require('./middlewares/common'),
   { checkIfUserIsLogged } = require('./middlewares/user'),
   schemas = require('./schemas'),
-  { API_BASE_URL } = require('./constants');
+  { DESCRIPTOR, API_BASE_URL } = require('./constants'),
 
 exports.init = app => {
-  app.get('/', (req, res) => res.send('Welcome to Heroku'));
+  app.get('/', (req, res) => res.send(DESCRIPTOR));
   // app.post('/insert-sources', [checkIfUserIsLogged], insertSources);
   // app.get('/periodic-news', getPeriodicNews);
   app.get(`${API_BASE_URL}/medios`, getSources);

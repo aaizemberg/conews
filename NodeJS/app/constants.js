@@ -1,3 +1,13 @@
+const project = require('../package.json');
+
+exports.DESCRIPTOR = {
+  contributors: project.contributors,
+  description: project.description,
+  name: project.name,
+  version: project.version,
+  swagger: `https://newsapi.it.itba.edu.ar/api/v${project.version}/swagger/`
+};
+
 exports.EMAIL_REGEXP = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@wolox.com.ar$/;
 exports.PASSWORD_REGEXP = /^[0-9a-zA-Z]+$/;
 exports.PASSWORD_MIN_LENGTH = 8;
