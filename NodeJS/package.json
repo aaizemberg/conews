@@ -1,11 +1,16 @@
 {
-  "name": "WTraining",
+  "name": "NewsAPI",
   "version": "0.1.0",
-  "description": "WTraining",
+  "description": "An API to analyze news from the main media of Argentina",
   "engines": {
     "node": "10.14.1",
     "npm": "6.4.1"
   },
+  "contributors": [
+    "Ariel Atar",
+    "Ariel Aizemberg",
+    "Oliver Balfour"
+  ],
   "scripts": {
     "console": "node console.js",
     "cover": "NODE_ENV=testing jest --coverage --runInBand --forceExit test/app",
