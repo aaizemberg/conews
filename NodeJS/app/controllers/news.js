@@ -35,14 +35,16 @@ const getPeriodicNewsJob = () => {
             });
             if (!news) {
               const { title, link, pubDate } = item;
-              const itemTitle = title.split(' - ')[0];
-              await News.create({
-                title: itemTitle,
-                url: link,
-                publicationDate: getDate(new Date(pubDate)),
-                content: itemTitle,
-                sourceId: sources[i].id
-              });
+              if (link.startsWith(sources[i].url)) {
+                const itemTitle = title.split(' - ')[0];
+                await News.create({
+                  title: itemTitle,
+                  url: link,
+                  publicationDate: getDate(new Date(pubDate)),
+                  content: itemTitle,
+                  sourceId: sources[i].id
+                });
+              }
             }
           });
         } catch (error) {
