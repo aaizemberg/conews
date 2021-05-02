@@ -117,7 +117,7 @@ exports.searchSQL = async (req, res) => {
   const sources_arr = sources ? sources.split(',') : DEFAULT_ARRAY;
   const news = await db.sequelize.query(
     '\
-  SELECT "News"."url", "Sources"."name" AS "source", "News"."title" \
+  SELECT "News"."url", "Sources"."name" AS "source", "News"."title", "News"."publicationDate" \
   FROM "News" INNER JOIN "Sources" ON "News"."sourceId"="Sources"."id" \
   WHERE "News"."publicationDate" IS NOT NULL AND "News"."publicationDate" >= (:d_from) \
   AND "News"."publicationDate" <= (:d_to) AND LOWER("News"."title") LIKE (:words) AND "Sources"."id" IN (:sources)\
