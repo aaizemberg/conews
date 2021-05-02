@@ -11,48 +11,52 @@ const { getNews } = require('../services/googleNews'),
   { DEFAULT_ARRAY } = require('./constants'),
   db = require('../models');
 
-exports.getPeriodicNews = () => {
-  schedule.scheduleJob('0 * * * *', () => {
-    logger.info('Getting news...');
-    return Sources.findAll()
-      .then(async sources => {
-        for (let i = 0; i < sources.length; i++) {
-          try {
-            const response = await getNews([sources[i].url]);
-            await Sources.update(
-              {
-                lastUpdate: getCurrentDate()
-              },
-              {
-                where: { url: sources[i].url }
-              }
-            );
-            response.items.map(async item => {
-              const news = await News.findOne({
-                where: {
-                  url: item.link,
-                  title: item.title.split(' - ')[0]
-                }
-              });
-              if (!news) {
-                const { title, link, pubDate } = item;
-                const itemTitle = title.split(' - ')[0];
-                await News.create({
-                  title: itemTitle,
-                  summary: itemTitle,
-                  url: link,
-                  publicationDate: getDate(new Date(pubDate)),
-                  content: itemTitle,
-                  sourceId: sources[i].id
-                });
+const getPeriodicNewsJob = () => {
+  logger.info('Getting news...');
+  return Sources.findAll()
+    .then(async sources => {
+      for (let i = 0; i < sources.length; i++) {
+        try {
+          const response = await getNews([sources[i].url]);
+          await Sources.update(
+            {
+              lastUpdate: getCurrentDate()
+            },
+            {
+              where: { url: sources[i].url }
+            }
+          );
+          response.items.map(async item => {
+            const news = await News.findOne({
+              where: {
+                url: item.link,
+                title: item.title.split(' - ')[0]
               }
             });
-          } catch (error) {
-            logger.info(error);
-          }
+            if (!news) {
+              const { title, link, pubDate } = item;
+              const itemTitle = title.split(' - ')[0];
+              await News.create({
+                title: itemTitle,
+                url: link,
+                publicationDate: getDate(new Date(pubDate)),
+                content: itemTitle,
+                sourceId: sources[i].id
+              });
+            }
+          });
+        } catch (error) {
+          logger.info(error);
         }
-      })
-      .catch(error => error);
+      }
+    })
+    .catch(error => error);
+};
+
+exports.getPeriodicNews = () => {
+  getPeriodicNewsJob();
+  schedule.scheduleJob('0 * * * *', () => {
+    getPeriodicNewsJob();
   });
   logger.info('Schedule created!');
 };
@@ -113,7 +117,7 @@ exports.searchSQL = async (req, res) => {
   const sources_arr = sources ? sources.split(',') : DEFAULT_ARRAY;
   const news = await db.sequelize.query(
     '\
-  SELECT "News"."url", "Sources"."name" AS "source", "News"."summary", "News"."title" \
+  SELECT "News"."url", "Sources"."name" AS "source", "News"."title" \
   FROM "News" INNER JOIN "Sources" ON "News"."sourceId"="Sources"."id" \
   WHERE "News"."publicationDate" IS NOT NULL AND "News"."publicationDate" >= (:d_from) \
   AND "News"."publicationDate" <= (:d_to) AND LOWER("News"."title") LIKE (:words) AND "Sources"."id" IN (:sources)\

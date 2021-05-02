@@ -9,10 +9,6 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING(1000),
         allowNull: false
       },
-      summary: {
-        type: Sequelize.STRING(1000),
-        allowNull: true
-      },
       url: {
         type: Sequelize.STRING,
         allowNull: false
