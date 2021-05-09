@@ -7,7 +7,9 @@ const { getSources } = require('./controllers/sources'),
     wordtree,
     wordcloud,
     trends,
-    insertStopword
+    insertStopword,
+    getStopwords,
+    deleteStopword
   } = require('./controllers/news'),
   { login, addUser } = require('./controllers/user'),
   { validateSchema } = require('./middlewares/common'),
@@ -31,6 +33,8 @@ exports.init = app => {
   app.get(`${API_BASE_URL}/nube-de-palabras`, wordcloud);
   app.get(`${API_BASE_URL}/tendencias`, trends);
   app.post(`${API_BASE_URL}/insert-stopword`, [checkIfUserIsLogged], insertStopword);
+  app.get(`${API_BASE_URL}/stopwords`, [checkIfUserIsLogged], getStopwords);
+  app.delete(`${API_BASE_URL}/stopword`, [checkIfUserIsLogged], deleteStopword);
   app.post(`${API_BASE_URL}/login`, [validateSchema(schemas.userSignIn)], login);
   app.post(`${API_BASE_URL}/user`, [validateSchema(schemas.userSignUp)], addUser);
 };

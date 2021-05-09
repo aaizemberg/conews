@@ -305,3 +305,25 @@ exports.insertStopword = async (req, res) => {
   });
   return res.send('Ok, inserted stopword');
 };
+
+exports.getStopwords = async (req, res) => {
+  const response = await Stopwords.findAll();
+  return res.send(response);
+};
+
+exports.deleteStopword = async (req, res) => {
+  const stopword = await Stopwords.findOne({
+    where: {
+      word: req.query.word
+    }
+  });
+  if (!stopword) {
+    return res.status(400).send('Cannot find stopword');
+  }
+  await Stopwords.destroy({
+    where: {
+      word: req.query.word
+    }
+  });
+  return res.send('Ok, deleted stopword');
+};

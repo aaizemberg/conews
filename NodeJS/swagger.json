@@ -396,6 +396,58 @@
           ]
         },
         "parameters": []
+      },
+      "/stopwords": {
+        "get": {
+          "operationId": "getStopwords",
+          "description": "Get Stopwords",
+          "parameters": [
+            {
+              "name": "authorization",
+              "in": "header",
+              "description": "Authorization token",
+              "type": "string"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Administrador"
+          ]
+        },
+        "parameters": []
+      },
+      "/stopword": {
+        "delete": {
+          "operationId": "deleteStopword",
+          "description": "Delete Stopword",
+          "parameters": [
+            {
+              "name": "authorization",
+              "in": "header",
+              "description": "Authorization token",
+              "type": "string"
+            },
+            {
+              "name": "word",
+              "in": "query",
+              "description": "Word to add to stopwords",
+              "type": "string"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Administrador"
+          ]
+        },
+        "parameters": []
       }
    },
    "definitions": {}
