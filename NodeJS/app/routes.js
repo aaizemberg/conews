@@ -9,7 +9,8 @@ const { getSources } = require('./controllers/sources'),
     trends,
     insertStopword,
     getStopwords,
-    deleteStopword
+    deleteStopword,
+    getAllEntities,
   } = require('./controllers/news'),
   { login, addUser } = require('./controllers/user'),
   { validateSchema } = require('./middlewares/common'),
@@ -37,4 +38,5 @@ exports.init = app => {
   app.delete(`${API_BASE_URL}/stopword`, [checkIfUserIsLogged], deleteStopword);
   app.post(`${API_BASE_URL}/login`, [validateSchema(schemas.userSignIn)], login);
   app.post(`${API_BASE_URL}/user`, [validateSchema(schemas.userSignUp)], addUser);
+  app.get(`${API_BASE_URL}/entities`, getAllEntities);
 };

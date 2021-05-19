@@ -3,10 +3,11 @@
 /* eslint-disable max-lines */
 /* eslint-disable max-statements */
 /* eslint-disable max-lines */
+const axios = require("axios");
 const { getNews } = require('../services/googleNews'),
   logger = require('../logger'),
   schedule = require('node-schedule'),
-  { News, Sources, Stopwords } = require('../models'),
+  { News, Sources, Stopwords, Entities, EntitiesNews } = require('../models'),
   { getDate, success, getCurrentDate } = require('./utils'),
   { DEFAULT_ARRAY } = require('./constants'),
   db = require('../models');
@@ -53,6 +54,100 @@ const getPeriodicNewsJob = () => {
       }
     })
     .catch(error => error);
+};
+
+exports.getAllEntities = (req, res) => {
+  logger.info('Getting news...');
+  return News.findAll()
+      .then(async news => {
+        for (let i = 0; i < news.length; i++) {
+          try {
+
+            const article = "El Gobierno ajusta, pisa y controla, pero la alerta de la inflación sigue prendida"
+                //[news[i].title]
+            const response = await getEntities(news[0]);
+            res.send(success(response));
+
+          } catch (error) {
+            logger.info(error);
+          }
+        }
+      })
+      .catch(error => error);
+};
+
+const getEntities = async (news) => {
+  logger.info('Getting entities...');
+
+  //let entities = await Entities.findAll();
+  //return res.send(entities.data);
+
+    const resultNerd = await axios({
+      url: 'http://nerd.it.itba.edu.ar:80/api/auth/token',
+      method: 'post',
+      headers: {
+        accept: 'application/json',
+        'Content-Type': 'application/json'
+      },
+      data: {
+        grant_type: 'password',
+        username: 'nerdapi@mailinator.com',
+        password: 'p455w0rd'
+      }
+    })
+
+    const access_token = resultNerd.data.access_token
+
+    //entitiesCalculated
+
+  try {
+    const response = await axios({
+      url: 'http://nerd.it.itba.edu.ar:80/api/ner/current/entities',
+      method: 'post',
+      headers: {
+        accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + access_token
+      },
+      data: {
+        text: news.title
+      }
+    }).then(async (response) => {
+      for (let i = 0; i < response.data.entities.length; i++) {
+        response.data.entities[i].name = news.title.slice(response.data.entities[i].start,response.data.entities[i].end);
+      }
+      const data = response.data;
+      let createEntity = await Entities.create({
+        name: data.entities[0].name,
+        type: data.entities[0].label,
+        field: 'TITLE',
+        program: 'NERD_API'
+      });
+      let entitiesNews = await EntitiesNews.create({
+        entityId: createEntity.id,
+        newId: news.id
+      });
+      return createEntity;
+    }).catch((error) => {
+      console.log(error);
+    });
+
+  } catch (error) {
+    console.error(error);
+  }
+
+  /* let createEntity = await Entities.create({
+    name: entities.data.entities[0].name,
+    type: entities.data.entities[0].label,
+    field: 'TITLE',
+    program: 'NERD_API'
+  });*/
+
+    /*let entitiesNews = await EntitiesNews.create({
+      entityId: createEntity.id,
+      newId: news[0].id
+    });*/
+
 };
 
 exports.getPeriodicNews = () => {
