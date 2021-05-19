@@ -85,6 +85,7 @@
     "umzug": "^2.1.0"
   },
   "devDependencies": {
+    "axios": "^0.21.1",
     "babel": "6.23.0",
     "babel-cli": "^6.26.0",
     "babel-core": "6.26.0",
