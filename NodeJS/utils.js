@@ -4,9 +4,11 @@ const { Sources } = require('./app/models'),
 exports.insertSources = async () => {
   for (let i = 0; i < SOURCES.length; i++) {
     const { name, url } = SOURCES[i];
-    await Sources.create({
-      name,
-      url
+    await Sources.findOrCreate({
+      where: {
+        name,
+        url
+      }
     });
   }
 };
