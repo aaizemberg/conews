@@ -66,8 +66,8 @@ exports.getEntities = async (req, res) => {
 };
 
 exports.extractPeriodicEntities = () => {
-  // Every day at At 10:00.
-  schedule.scheduleJob('0 10 * * *', () => {
+  // 15 minutes past every hour
+  schedule.scheduleJob('15 * * * *', () => {
     extractAllEntities();
   });
   logger.info('Schedule for Entities created!');

@@ -448,7 +448,22 @@
           ]
         },
         "parameters": []
-      }
+      },
+     "/entidades": {
+       "get": {
+         "operationId": "entidades",
+         "description": "Devuelve todas las entidades encontradas hasta el momento.",
+         "parameters": [],
+         "responses": {
+           "200": {
+             "description": ""
+           }
+         },
+         "tags": [
+           "Entidades"
+         ]
+       }
+     }
    },
    "definitions": {}
  }
