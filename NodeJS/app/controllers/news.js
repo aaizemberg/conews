@@ -124,15 +124,16 @@ const extractEntities = async news => {
           });
           if (data.entities.length === count) {
             await News.update(
-                { entitiesCalculated: true }, {
-                  where: {
-                    id: news.id
-                  }
-                });
+              { entitiesCalculated: true }, {
+                where: {
+                  id: news.id
+                }
+              }
+            );
           }
           return data.entities;
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error);
         });
     } catch (error) {
