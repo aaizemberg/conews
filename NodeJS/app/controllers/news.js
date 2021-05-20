@@ -124,7 +124,8 @@ const extractEntities = async news => {
           });
           if (data.entities.length === count) {
             await News.update(
-              { entitiesCalculated: true }, {
+              { entitiesCalculated: true },
+              {
                 where: {
                   id: news.id
                 }
