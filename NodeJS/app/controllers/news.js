@@ -103,8 +103,8 @@ const extractEntities = async news => {
         .then(async response => {
           const { data } = response;
           for (let i = 0; i < data.entities.length; i++) {
-            data.entities[i].name = news.title.slice(data.entities[i].start,data.entities[i].end);
-            const [entity, created] = await Entities.findOrCreate({
+            data.entities[i].name = news.title.slice(data.entities[i].start, data.entities[i].end);
+            const [entity] = await Entities.findOrCreate({
               where: {
                 name: data.entities[i].name,
                 type: data.entities[i].label,
@@ -112,25 +112,27 @@ const extractEntities = async news => {
                 program: 'NERD_API'
               }
             });
-            let entitiesNews = await EntitiesNews.create({
+            await EntitiesNews.create({
               entityId: entity.id,
               newId: news.id
             });
           }
-          const { count, rows } = await EntitiesNews.findAndCountAll({
+          const { count } = await EntitiesNews.findAndCountAll({
             where: {
               newId: news.id
             }
-          })
-          if( data.entities.length == count ){
-            await News.update({ entitiesCalculated: true }, {
-              where: {
-                id: news.id
-              }
-            });
+          });
+          if (data.entities.length === count) {
+            await News.update(
+                { entitiesCalculated: true }, {
+                  where: {
+                    id: news.id
+                  }
+                });
           }
           return data.entities;
-        }).catch((error) => {
+        })
+        .catch((error) => {
           console.log(error);
         });
     } catch (error) {
@@ -142,17 +144,17 @@ const extractEntities = async news => {
 const extractAllEntities = () => {
   logger.info('Extracting all entities...');
   return News.findAll()
-      .then(async news => {
-        for (let i = 0; i < news.length; i++) {
-          try {
-            await extractEntities(news[i]);
-          } catch (error) {
-            logger.info(error);
-          }
+    .then(async news => {
+      for (let i = 0; i < news.length; i++) {
+        try {
+          await extractEntities(news[i]);
+        } catch (error) {
+          logger.info(error);
         }
-        logger.info('Extracting all entities finished');
-      })
-      .catch(error => error);
+      }
+      logger.info('Extracting all entities finished');
+    })
+    .catch(error => error);
 };
 
 exports.extractPeriodicEntities = () => {
