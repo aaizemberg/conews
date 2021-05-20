@@ -58,35 +58,11 @@ const getPeriodicNewsJob = () => {
 
 exports.getEntities = async (req, res) => {
   logger.info('Searching for entities...');
-  //const { type } = req.query;
+  // const { type } = req.query;
   const entities = await Entities.findAll({
     attributes: [['name', 'entity'], 'type', 'id']
   });
   return res.send(success(entities));
-};
-
-exports.extractPeriodicEntities = () => {
-  // 15 minutes past every hour
-  schedule.scheduleJob('15 * * * *', () => {
-    extractAllEntities();
-  });
-  logger.info('Schedule for Entities created!');
-};
-
-const extractAllEntities = () => {
-  logger.info('Extracting all entities...');
-  return News.findAll()
-    .then(async news => {
-      for (let i = 0; i < news.length; i++) {
-        try {
-          await extractEntities(news[i]);
-        } catch (error) {
-          logger.info(error);
-        }
-      }
-      logger.info('Extracting all entities finished');
-    })
-    .catch(error => error);
 };
 
 const extractEntities = async news => {
@@ -109,7 +85,7 @@ const extractEntities = async news => {
       }
     });
 
-    const {access_token} = resultNerd.data;
+    const { access_token } = resultNerd.data;
 
     try {
       await axios({
@@ -124,46 +100,67 @@ const extractEntities = async news => {
           text: news.title
         }
       })
-          .then(async response => {
-        const {data} = response;
-        for (let i = 0; i < data.entities.length; i++) {
-          data.entities[i].name = news.title.slice(data.entities[i].start,data.entities[i].end);
-          const [entity, created] = await Entities.findOrCreate({
-            where: {
-              name: data.entities[i].name,
-              type: data.entities[i].label,
-              field: 'TITLE',
-              program: 'NERD_API'
-            }
-          });
-          let entitiesNews = await EntitiesNews.create({
-            entityId: entity.id,
-            newId: news.id
-          });
-        }
-        const { count, rows } = await EntitiesNews.findAndCountAll({
-          where: {
-            newId: news.id
+        .then(async response => {
+          const { data } = response;
+          for (let i = 0; i < data.entities.length; i++) {
+            data.entities[i].name = news.title.slice(data.entities[i].start,data.entities[i].end);
+            const [entity, created] = await Entities.findOrCreate({
+              where: {
+                name: data.entities[i].name,
+                type: data.entities[i].label,
+                field: 'TITLE',
+                program: 'NERD_API'
+              }
+            });
+            let entitiesNews = await EntitiesNews.create({
+              entityId: entity.id,
+              newId: news.id
+            });
           }
-        })
-
-        if( data.entities.length == count ){
+          const { count, rows } = await EntitiesNews.findAndCountAll({
+            where: {
+              newId: news.id
+            }
+          })
+          if( data.entities.length == count ){
             await News.update({ entitiesCalculated: true }, {
               where: {
                 id: news.id
               }
             });
           }
-
-        return data.entities;
-      }).catch((error) => {
-        console.log(error);
-      });
-
+          return data.entities;
+        }).catch((error) => {
+          console.log(error);
+        });
     } catch (error) {
       console.error(error);
     }
   }
+};
+
+const extractAllEntities = () => {
+  logger.info('Extracting all entities...');
+  return News.findAll()
+      .then(async news => {
+        for (let i = 0; i < news.length; i++) {
+          try {
+            await extractEntities(news[i]);
+          } catch (error) {
+            logger.info(error);
+          }
+        }
+        logger.info('Extracting all entities finished');
+      })
+      .catch(error => error);
+};
+
+exports.extractPeriodicEntities = () => {
+  // 15 minutes past every hour
+  schedule.scheduleJob('15 * * * *', () => {
+    extractAllEntities();
+  });
+  logger.info('Schedule for Entities created!');
 };
 
 exports.getPeriodicNews = () => {

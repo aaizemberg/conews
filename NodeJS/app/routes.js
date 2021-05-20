@@ -10,7 +10,7 @@ const { getSources } = require('./controllers/sources'),
     insertStopword,
     getStopwords,
     deleteStopword,
-    getEntities,
+    getEntities
   } = require('./controllers/news'),
   { login, addUser } = require('./controllers/user'),
   { validateSchema } = require('./middlewares/common'),
