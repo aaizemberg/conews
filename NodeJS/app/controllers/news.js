@@ -56,32 +56,45 @@ const getPeriodicNewsJob = () => {
     .catch(error => error);
 };
 
-exports.getAllEntities = (req, res) => {
-  logger.info('Getting news...');
+exports.getEntities = async (req, res) => {
+  logger.info('Searching for entities...');
+  const { type } = req.query;
+  const entities = await Entities.findAll({
+    attributes: [['name', 'entity'], 'type', 'id']
+  })
+  return res.send(success(entities));
+};
+
+exports.extractPeriodicEntities = () => {
+  // Every day at At 10:00.
+  schedule.scheduleJob('0 10 * * *', () => {
+    extractAllEntities();
+  });
+  logger.info('Schedule for Entities created!');
+};
+
+const extractAllEntities = () => {
+  logger.info("Extracting all entities...");
   return News.findAll()
       .then(async news => {
         for (let i = 0; i < news.length; i++) {
           try {
-
-            const article = "El Gobierno ajusta, pisa y controla, pero la alerta de la inflación sigue prendida"
-                //[news[i].title]
-            const response = await getEntities(news[0]);
-            res.send(success(response));
-
+            const response = await extractEntities(news[i]);
           } catch (error) {
             logger.info(error);
           }
         }
+        logger.info('Extracting all entities finished');
       })
       .catch(error => error);
 };
 
-const getEntities = async (news) => {
-  logger.info('Getting entities...');
+const extractEntities = async (news) => {
+  logger.info(`Extracting entities for article with id ${news.id}...`);
 
-  //let entities = await Entities.findAll();
-  //return res.send(entities.data);
+  //TODO: credentials shouldn't be stored within code
 
+  if(!news.entitiesCalculated){
     const resultNerd = await axios({
       url: 'http://nerd.it.itba.edu.ar:80/api/auth/token',
       method: 'post',
@@ -98,56 +111,58 @@ const getEntities = async (news) => {
 
     const access_token = resultNerd.data.access_token
 
-    //entitiesCalculated
+    try {
+      const response = await axios({
+        url: 'http://nerd.it.itba.edu.ar:80/api/ner/current/entities',
+        method: 'post',
+        headers: {
+          accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + access_token
+        },
+        data: {
+          text: news.title
+        }
+      }).then(async (response) => {
+        const data = response.data;
+        for (let i = 0; i < data.entities.length; i++) {
+          data.entities[i].name = news.title.slice(data.entities[i].start,data.entities[i].end);
+          const [entity, created] = await Entities.findOrCreate({
+            where: {
+              name: data.entities[i].name,
+              type: data.entities[i].label,
+              field: 'TITLE',
+              program: 'NERD_API'
+            }
+          });
+          let entitiesNews = await EntitiesNews.create({
+            entityId: entity.id,
+            newId: news.id
+          });
+        }
+        const { count, rows } = await EntitiesNews.findAndCountAll({
+          where: {
+            newId: news.id
+          }
+        })
 
-  try {
-    const response = await axios({
-      url: 'http://nerd.it.itba.edu.ar:80/api/ner/current/entities',
-      method: 'post',
-      headers: {
-        accept: 'application/json',
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + access_token
-      },
-      data: {
-        text: news.title
-      }
-    }).then(async (response) => {
-      for (let i = 0; i < response.data.entities.length; i++) {
-        response.data.entities[i].name = news.title.slice(response.data.entities[i].start,response.data.entities[i].end);
-      }
-      const data = response.data;
-      let createEntity = await Entities.create({
-        name: data.entities[0].name,
-        type: data.entities[0].label,
-        field: 'TITLE',
-        program: 'NERD_API'
-      });
-      let entitiesNews = await EntitiesNews.create({
-        entityId: createEntity.id,
-        newId: news.id
-      });
-      return createEntity;
-    }).catch((error) => {
-      console.log(error);
-    });
+        if( data.entities.length == count ){
+            await News.update({ entitiesCalculated: true }, {
+              where: {
+                id: news.id
+              }
+            });
+          }
 
-  } catch (error) {
-    console.error(error);
+        return data.entities;
+      }).catch((error) => {
+        console.log(error);
+      });
+
+    } catch (error) {
+      console.error(error);
+    }
   }
-
-  /* let createEntity = await Entities.create({
-    name: entities.data.entities[0].name,
-    type: entities.data.entities[0].label,
-    field: 'TITLE',
-    program: 'NERD_API'
-  });*/
-
-    /*let entitiesNews = await EntitiesNews.create({
-      entityId: createEntity.id,
-      newId: news[0].id
-    });*/
-
 };
 
 exports.getPeriodicNews = () => {
