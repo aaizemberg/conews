@@ -3,7 +3,7 @@
 /* eslint-disable max-lines */
 /* eslint-disable max-statements */
 /* eslint-disable max-lines */
-const axios = require("axios");
+const axios = require('axios');
 const { getNews } = require('../services/googleNews'),
   logger = require('../logger'),
   schedule = require('node-schedule'),
@@ -58,10 +58,10 @@ const getPeriodicNewsJob = () => {
 
 exports.getEntities = async (req, res) => {
   logger.info('Searching for entities...');
-  const { type } = req.query;
+  //const { type } = req.query;
   const entities = await Entities.findAll({
     attributes: [['name', 'entity'], 'type', 'id']
-  })
+  });
   return res.send(success(entities));
 };
 
@@ -74,27 +74,27 @@ exports.extractPeriodicEntities = () => {
 };
 
 const extractAllEntities = () => {
-  logger.info("Extracting all entities...");
+  logger.info('Extracting all entities...');
   return News.findAll()
-      .then(async news => {
-        for (let i = 0; i < news.length; i++) {
-          try {
-            const response = await extractEntities(news[i]);
-          } catch (error) {
-            logger.info(error);
-          }
+    .then(async news => {
+      for (let i = 0; i < news.length; i++) {
+        try {
+          await extractEntities(news[i]);
+        } catch (error) {
+          logger.info(error);
         }
-        logger.info('Extracting all entities finished');
-      })
-      .catch(error => error);
+      }
+      logger.info('Extracting all entities finished');
+    })
+    .catch(error => error);
 };
 
-const extractEntities = async (news) => {
+const extractEntities = async news => {
   logger.info(`Extracting entities for article with id ${news.id}...`);
 
-  //TODO: credentials shouldn't be stored within code
+  //  TODO: credentials shouldn't be stored within code
 
-  if(!news.entitiesCalculated){
+  if (!news.entitiesCalculated) {
     const resultNerd = await axios({
       url: 'http://nerd.it.itba.edu.ar:80/api/auth/token',
       method: 'post',
@@ -107,24 +107,25 @@ const extractEntities = async (news) => {
         username: 'nerdapi@mailinator.com',
         password: 'p455w0rd'
       }
-    })
+    });
 
-    const access_token = resultNerd.data.access_token
+    const {access_token} = resultNerd.data;
 
     try {
-      const response = await axios({
+      await axios({
         url: 'http://nerd.it.itba.edu.ar:80/api/ner/current/entities',
         method: 'post',
         headers: {
           accept: 'application/json',
           'Content-Type': 'application/json',
-          Authorization: 'Bearer ' + access_token
+          Authorization: `Bearer ${access_token}`
         },
         data: {
           text: news.title
         }
-      }).then(async (response) => {
-        const data = response.data;
+      })
+          .then(async response => {
+        const {data} = response;
         for (let i = 0; i < data.entities.length; i++) {
           data.entities[i].name = news.title.slice(data.entities[i].start,data.entities[i].end);
           const [entity, created] = await Entities.findOrCreate({
