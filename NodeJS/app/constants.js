@@ -4,8 +4,8 @@ exports.DESCRIPTOR = {
   contributors: project.contributors,
   description: project.description,
   name: project.name,
-  version: "v1",
-  swagger: "https://newsapi.it.itba.edu.ar/api/v1/swagger/"
+  version: 'v1',
+  swagger: 'https://newsapi.it.itba.edu.ar/api/v1/swagger/'
 };
 
 exports.EMAIL_REGEXP = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@wolox.com.ar$/;
