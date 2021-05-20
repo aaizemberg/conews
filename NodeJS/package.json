@@ -1,6 +1,6 @@
 {
   "name": "NewsAPI",
-  "version": "1",
+  "version": "0.1.0",
   "description": "An API to analyze news from the main media of Argentina",
   "engines": {
     "node": "10.14.1",
