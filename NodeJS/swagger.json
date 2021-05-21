@@ -369,9 +369,8 @@
             {
               "name": "types",
               "in": "query",
-              "description": "Buscar entidades de un tipo en especial.",
-              "type": "string",
-              "enum": ["MISC", "PER", "LOC", "ORG"]
+              "description": "Buscar entidades de un tipo en especial, separados por coma [\"MISC\", \"PER\", \"LOC\", \"ORG\"]",
+              "type": "string"
             },
             {
               "name": "sources",
