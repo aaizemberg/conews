@@ -17,9 +17,9 @@ const { expressMiddleware, expressRequestIdMiddleware } = require('express-wolox
   } = require('./constants');
 
 const swaggerOptions = {
-    swaggerOptions: {
-        tryItOutEnabled: true
-    }
+  swaggerOptions: {
+    tryItOutEnabled: true
+  }
 };
 
 const bodyParserJsonConfig = () => ({
