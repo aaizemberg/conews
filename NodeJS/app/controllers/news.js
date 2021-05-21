@@ -9,7 +9,7 @@ const { getNews } = require('../services/googleNews'),
   schedule = require('node-schedule'),
   { News, Sources, Stopwords, Entities, EntitiesNews } = require('../models'),
   { getDate, success, getCurrentDate } = require('./utils'),
-  { DEFAULT_ARRAY } = require('./constants'),
+  { DEFAULT_ARRAY, DEFAULT_TYPES_ENTITIES } = require('./constants'),
   db = require('../models');
 
 const getPeriodicNewsJob = () => {
@@ -58,10 +58,33 @@ const getPeriodicNewsJob = () => {
 
 exports.getEntities = async (req, res) => {
   logger.info('Searching for entities...');
-  // const { type } = req.query;
-  const entities = await Entities.findAll({
+  const { d_from, d_to, types, sources } = req.query;
+  const types_arr = types ? types.split(',') : DEFAULT_TYPES_ENTITIES;
+  const sources_arr = sources ? sources.split(',') : DEFAULT_ARRAY;
+  const entities = await db.sequelize.query(
+      '\
+    SELECT "Entities"."name" AS "entity", "Entities"."type", "Entities"."id", COUNT(*) AS quantity \
+    FROM "Entities" INNER JOIN "EntitiesNews" ON "Entities"."id"="EntitiesNews"."entityId"\
+    INNER JOIN "News" ON "EntitiesNews"."newId"="News"."id" \
+    INNER JOIN "Sources" ON "News"."sourceId"="Sources"."id" \
+    WHERE "News"."publicationDate" IS NOT NULL AND "News"."publicationDate" >= (:d_from) \
+    AND "News"."publicationDate" <= (:d_to) AND "Entities"."type" IN (:types)\
+    AND "Sources"."id" IN (:sources)\
+    GROUP BY "Entities"."id"\
+    ORDER BY quantity DESC',
+      {
+        replacements: {
+          d_from: d_from ? d_from : getCurrentDate(),
+          d_to: d_to ? d_to : getCurrentDate(),
+          types: types_arr,
+          sources: sources_arr
+        },
+        type: db.sequelize.QueryTypes.SELECT
+      }
+  );
+  /*const entities = await Entities.findAll({
     attributes: [['name', 'entity'], 'type', 'id']
-  });
+  });*/
   return res.send(success(entities));
 };
 

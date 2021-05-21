@@ -345,6 +345,51 @@
             }
           ]
        },
+       "/entidades": {
+        "get": {
+          "operationId": "entidades",
+          "description": "Devuelve todas las entidades encontradas en un rango de fechas. Si no se especifica rango de fechas, devuelve la cantidad de noticias del día.",
+          "parameters": [
+            {
+              "name": "d_from",
+              "in": "query",
+              "description": "Fecha desde. Formato: yyyy-mm-dd",
+              "type": "string",
+              "format": "date",
+              "pattern": "\\d{4}-\\d{2}-\\d{2}"
+            },
+            {
+              "name": "d_to",
+              "in": "query",
+              "description": "Fecha hasta. Formato: yyyy-mm-dd",
+              "type": "string",
+              "format": "date",
+              "pattern": "\\d{4}-\\d{2}-\\d{2}"
+            },
+            {
+              "name": "types",
+              "in": "query",
+              "description": "Buscar entidades de un tipo en especial.",
+              "type": "string",
+              "enum": ["MISC", "PER", "LOC", "ORG"]
+            },
+            {
+              "name": "sources",
+              "in": "query",
+              "description": "Buscar entidades de los medios con estos IDs, separados por coma",
+              "type": "string"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Entidades"
+          ]
+        }
+       },
        "/login": {
         "post": {
           "operationId": "login",
@@ -448,22 +493,7 @@
           ]
         },
         "parameters": []
-      },
-     "/entidades": {
-       "get": {
-         "operationId": "entidades",
-         "description": "Devuelve todas las entidades encontradas hasta el momento.",
-         "parameters": [],
-         "responses": {
-           "200": {
-             "description": ""
-           }
-         },
-         "tags": [
-           "Entidades"
-         ]
-       }
-     }
+      }
    },
    "definitions": {}
  }

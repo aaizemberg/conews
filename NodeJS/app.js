@@ -16,6 +16,12 @@ const { expressMiddleware, expressRequestIdMiddleware } = require('express-wolox
     PAGINATE_MAX_LIMIT
   } = require('./constants');
 
+const swaggerOptions = {
+    swaggerOptions: {
+        tryItOutEnabled: true
+    }
+};
+
 const bodyParserJsonConfig = () => ({
   parameterLimit: config.common.api.parameterLimit || DEFAULT_PARAMETER_LIMIT,
   limit: config.common.api.bodySizeLimit || DEFAULT_BODY_SIZE_LIMIT
@@ -30,7 +36,7 @@ const bodyParserUrlencodedConfig = () => ({
 const app = express();
 
 app.use('/docs', express.static(path.join(__dirname, 'docs')));
-app.use('/api/v1/swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use('/api/v1/swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocument, swaggerOptions));
 
 // Client must send "Content-Type: application/json" header
 app.use(bodyParser.json(bodyParserJsonConfig()));
