@@ -158,10 +158,10 @@ const extractEntities = async news => {
           return data.entities;
         })
         .catch(error => {
-          console.log(error);
+          logger.info(error);
         });
     } catch (error) {
-      console.error(error);
+      logger.info(error);
     }
   }
 };
