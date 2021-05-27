@@ -68,8 +68,7 @@ exports.changeEntities = async (req, res) => {
           where: {
             newId: news[i].id
           }
-        })
-        .then( async response => {
+        }).then( async response => {
           if (response.length > 0) {
             await News.update(
               { entitiesCalculated: false },
@@ -78,14 +77,14 @@ exports.changeEntities = async (req, res) => {
                   id: news.id
                 }
               }
-            )
+            );
           }
         });
       }
     })
     .catch(error => logger.info(error));
-  return res.send("ok");
-}
+  return res.send('ok');
+};
 
 exports.getEntities = async (req, res) => {
   logger.info('Searching for entities...');
