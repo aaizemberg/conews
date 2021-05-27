@@ -68,7 +68,7 @@ exports.changeEntities = async (req, res) => {
           where: {
             newId: news[i].id
           }
-        }).then( async response => {
+        }).then(async response => {
           if (response.length > 0) {
             await News.update(
               { entitiesCalculated: false },
