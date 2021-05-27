@@ -56,6 +56,37 @@ const getPeriodicNewsJob = () => {
     .catch(error => logger.info(error));
 };
 
+exports.changeEntities = async (req, res) => {
+  News.findAll({
+    where: {
+      publicationDate: "2021-05-27"
+    }
+  })
+  .then(async news => {
+    for (let i = 0; i < news.length; i++) {
+      await EntitiesNews.findAll({
+        where: {
+          newId: news[i].id
+        }
+      })
+      .then( async response => {
+        if (response.length > 0) {
+          await News.update(
+            { entitiesCalculated: false },
+            {
+              where: {
+                id: news.id
+              }
+            }
+          )
+        }
+      });
+    }
+  })
+  .catch(error => logger.info(error));
+  return res.send("ok");
+}
+
 exports.getEntities = async (req, res) => {
   logger.info('Searching for entities...');
   const { d_from, d_to, types, sources } = req.query;
