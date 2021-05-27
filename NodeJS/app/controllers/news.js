@@ -74,7 +74,7 @@ exports.changeEntities = async (req, res) => {
               { entitiesCalculated: false },
               {
                 where: {
-                  id: news.id
+                  id: news[i].id
                 }
               }
             );
