@@ -133,25 +133,24 @@ const extractEntities = async news => {
               field: 'TITLE',
               program: 'NERD_API'
             }
-          })
-            .then(async entity => {
-              await EntitiesNews.create({
-                entityId: entity.id,
-                newId: news.id
-              });
-            })
+          }).then(async entity => {
+            await EntitiesNews.create({
+              entityId: entity.id,
+              newId: news.id
+            });
+          });
         }
       })
       .then(
         await News.update(
           { entitiesCalculated: true },
-            {
-              where: {
+          {
+            where: {
               id: news.id
-              }
             }
-          )
-        );
+          }
+        )
+      );
   } catch (error) {
     // Error 😨
     if (error.response) {
@@ -195,7 +194,7 @@ const extractAllEntities = () => {
 
 exports.extractPeriodicEntities = () => {
   // 40 minutes past every hour
-  schedule.scheduleJob('40 * * * *', () => {
+  schedule.scheduleJob('45 * * * *', () => {
     extractAllEntities();
   });
   logger.info('Schedule for Entities created!');
