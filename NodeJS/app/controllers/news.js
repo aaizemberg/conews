@@ -88,7 +88,7 @@ exports.getEntities = async (req, res) => {
   } catch (error) {
     logger.info(error);
   }
-  return;
+  return res.send("Finished getting entities");
 };
 
 const extractEntities = async news => {
