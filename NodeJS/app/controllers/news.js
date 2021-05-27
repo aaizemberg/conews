@@ -61,13 +61,15 @@ exports.changeEntities = async (req, res) => {
     where: {
       publicationDate: '2021-05-27'
     }
-  }).then(async news => {
+  })
+    .then(async news => {
       for (let i = 0; i < news.length; i++) {
         await EntitiesNews.findAll({
           where: {
             newId: news[i].id
           }
-        }).then(  async response => {
+        })
+        .then( async response => {
           if (response.length > 0) {
             await News.update(
               { entitiesCalculated: false },
