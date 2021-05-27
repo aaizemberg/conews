@@ -140,18 +140,18 @@ const extractEntities = async news => {
                 newId: news.id
               });
             })
-            .then(
-              await News.update(
-                { entitiesCalculated: true },
-                {
-                  where: {
-                    id: news.id
-                  }
-                }
-              )
-            );
         }
-      });
+      })
+      .then(
+        await News.update(
+          { entitiesCalculated: true },
+            {
+              where: {
+              id: news.id
+              }
+            }
+          )
+        );
   } catch (error) {
     // Error 😨
     if (error.response) {
@@ -194,8 +194,8 @@ const extractAllEntities = () => {
 };
 
 exports.extractPeriodicEntities = () => {
-  // 15 minutes past every hour
-  schedule.scheduleJob('15 * * * *', () => {
+  // 40 minutes past every hour
+  schedule.scheduleJob('40 * * * *', () => {
     extractAllEntities();
   });
   logger.info('Schedule for Entities created!');
