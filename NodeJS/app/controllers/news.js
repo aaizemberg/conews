@@ -131,47 +131,47 @@ const extractEntities = async news => {
               program: 'NERD_API'
             }
           })
-            .then( async entity => {
+            .then(async entity => {
               await EntitiesNews.create({
                 entityId: entity.id,
                 newId: news.id
-              })
+              });
             })
             .then(
               await News.update(
                 { entitiesCalculated: true },
                 {
                   where: {
-                  id: news.id
+                    id: news.id
                   }
                 }
               )
             );
-          }
+        }
       });
-    } catch (error) {
-      // Error 😨
+  } catch (error) {
+    // Error 😨
     if (error.response) {
-        /*
-         * The request was made and the server responded with a
-         * status code that falls out of the range of 2xx
-         */
+      /*
+       * The request was made and the server responded with a
+       * status code that falls out of the range of 2xx
+       */
       logger.info(error.response.data);
       logger.info(error.response.status);
       logger.info(error.response.headers);
     } else if (error.request) {
-        /*
-         * The request was made but no response was received, `error.request`
-         * is an instance of XMLHttpRequest in the browser and an instance
-         * of http.ClientRequest in Node.js
-         */
+      /*
+       * The request was made but no response was received, `error.request`
+       * is an instance of XMLHttpRequest in the browser and an instance
+       * of http.ClientRequest in Node.js
+       */
       logger.info(error.request);
     } else {
-        // Something happened in setting up the request and triggered an Error
+      // Something happened in setting up the request and triggered an Error
       logger.info('Error', error.message);
     }
     logger.info(error);
-    }
+  }
 };
 
 const extractAllEntities = () => {
@@ -181,13 +181,13 @@ const extractAllEntities = () => {
       entitiesCalculated: false
     }
   })
-  .then(async news => {
+    .then(async news => {
       for (let i = 0; i < news.length; i++) {
-          await extractEntities(news[i]);
+        await extractEntities(news[i]);
       }
       logger.info('Extracting all entities finished');
     })
-  .catch(error => logger.info(error));
+    .catch(error => logger.info(error));
 };
 
 exports.extractPeriodicEntities = () => {
@@ -210,24 +210,26 @@ exports.getNewsQuantitySQL = async (req, res) => {
   logger.info('Getting news...');
   const { d_from, d_to, words, sources } = req.query;
   const sources_arr = sources ? sources.split(',') : DEFAULT_ARRAY;
-  const news = await db.sequelize.query(
-    '\
-  SELECT "News"."publicationDate" AS "date", COUNT("News"."id") AS cantidad \
-  FROM "News" INNER JOIN "Sources" ON "News"."sourceId"="Sources"."id" \
-  WHERE "News"."publicationDate" IS NOT NULL AND "News"."publicationDate" >= (:d_from) \
-  AND "News"."publicationDate" <= (:d_to) AND LOWER("News"."title") LIKE (:words) AND "Sources"."id" IN (:sources)\
-  GROUP BY "News"."publicationDate"\
-  ORDER BY "News"."publicationDate" DESC',
-    {
-      replacements: {
-        d_from: d_from ? d_from : getCurrentDate(),
-        d_to: d_to ? d_to : getCurrentDate(),
-        words: words ? `%${words.toLowerCase()}%` : '%',
-        sources: sources_arr
-      },
-      type: db.sequelize.QueryTypes.SELECT
-    }
-  ).catch(error => logger.info(error));
+  const news = await db.sequelize
+    .query(
+      '\
+      SELECT "News"."publicationDate" AS "date", COUNT("News"."id") AS cantidad \
+      FROM "News" INNER JOIN "Sources" ON "News"."sourceId"="Sources"."id" \
+      WHERE "News"."publicationDate" IS NOT NULL AND "News"."publicationDate" >= (:d_from) \
+      AND "News"."publicationDate" <= (:d_to) AND LOWER("News"."title") LIKE (:words) AND "Sources"."id" IN (:sources)\
+      GROUP BY "News"."publicationDate"\
+      ORDER BY "News"."publicationDate" DESC',
+        {
+          replacements: {
+            d_from: d_from ? d_from : getCurrentDate(),
+            d_to: d_to ? d_to : getCurrentDate(),
+            words: words ? `%${words.toLowerCase()}%` : '%',
+            sources: sources_arr
+          },
+          type: db.sequelize.QueryTypes.SELECT
+        }
+    )
+    .catch(error => logger.info(error));
   return res.send(success(news));
 };
 
@@ -235,24 +237,26 @@ exports.heatmapSQL = async (req, res) => {
   logger.info('Getting news...');
   const { d_from, d_to, words, sources } = req.query;
   const sources_arr = sources ? sources.split(',') : DEFAULT_ARRAY;
-  const news = await db.sequelize.query(
-    '\
-  SELECT "News"."publicationDate" AS "date", "Sources"."name" AS "source_name", COUNT("News"."id") AS "news_count" \
-  FROM "News" INNER JOIN "Sources" ON "News"."sourceId"="Sources"."id" \
-  WHERE "News"."publicationDate" IS NOT NULL AND "News"."publicationDate" >= (:d_from) \
-  AND "News"."publicationDate" <= (:d_to) AND LOWER("News"."title") LIKE (:words) AND "Sources"."id" IN (:sources)\
-  GROUP BY "News"."publicationDate", "Sources"."name"\
-  ORDER BY "News"."publicationDate" DESC',
-    {
-      replacements: {
-        d_from: d_from ? d_from : getCurrentDate(),
-        d_to: d_to ? d_to : getCurrentDate(),
-        words: words ? `%${words.toLowerCase()}%` : '%',
-        sources: sources_arr
-      },
-      type: db.sequelize.QueryTypes.SELECT
-    }
-  ).catch(error => logger.info(error));
+  const news = await db.sequelize
+    .query(
+      '\
+      SELECT "News"."publicationDate" AS "date", "Sources"."name" AS "source_name", COUNT("News"."id") AS "news_count" \
+      FROM "News" INNER JOIN "Sources" ON "News"."sourceId"="Sources"."id" \
+      WHERE "News"."publicationDate" IS NOT NULL AND "News"."publicationDate" >= (:d_from) \
+      AND "News"."publicationDate" <= (:d_to) AND LOWER("News"."title") LIKE (:words) AND "Sources"."id" IN (:sources)\
+      GROUP BY "News"."publicationDate", "Sources"."name"\
+      ORDER BY "News"."publicationDate" DESC',
+      {
+        replacements: {
+          d_from: d_from ? d_from : getCurrentDate(),
+          d_to: d_to ? d_to : getCurrentDate(),
+          words: words ? `%${words.toLowerCase()}%` : '%',
+          sources: sources_arr
+        },
+        type: db.sequelize.QueryTypes.SELECT
+      }
+    )
+    .catch(error => logger.info(error));
   return res.send(success(news));
 };
 
@@ -260,15 +264,16 @@ exports.searchSQL = async (req, res) => {
   logger.info('Search...');
   const { d_from, d_to, words, sources, page, limit } = req.query;
   const sources_arr = sources ? sources.split(',') : DEFAULT_ARRAY;
-  const news = await db.sequelize.query(
-    '\
-  SELECT "News"."url", "Sources"."name" AS "source", "News"."title", "News"."publicationDate" \
-  FROM "News" INNER JOIN "Sources" ON "News"."sourceId"="Sources"."id" \
-  WHERE "News"."publicationDate" IS NOT NULL AND "News"."publicationDate" >= (:d_from) \
-  AND "News"."publicationDate" <= (:d_to) AND LOWER("News"."title") LIKE (:words) AND "Sources"."id" IN (:sources)\
-  ORDER BY "News"."id" ASC\
-  OFFSET (:offset) ROWS\
-  FETCH NEXT (:limit) ROWS ONLY',
+  const news = await db.sequelize
+    .query(
+      '\
+    SELECT "News"."url", "Sources"."name" AS "source", "News"."title", "News"."publicationDate" \
+    FROM "News" INNER JOIN "Sources" ON "News"."sourceId"="Sources"."id" \
+    WHERE "News"."publicationDate" IS NOT NULL AND "News"."publicationDate" >= (:d_from) \
+    AND "News"."publicationDate" <= (:d_to) AND LOWER("News"."title") LIKE (:words) AND "Sources"."id" IN (:sources)\
+    ORDER BY "News"."id" ASC\
+    OFFSET (:offset) ROWS\
+    FETCH NEXT (:limit) ROWS ONLY',
     {
       replacements: {
         d_from: d_from ? d_from : getCurrentDate(),
@@ -279,8 +284,9 @@ exports.searchSQL = async (req, res) => {
         limit
       },
       type: db.sequelize.QueryTypes.SELECT
-    }
-  ).catch(error => logger.info(error));
+      }
+    )
+    .catch(error => logger.info(error));
   return res.send(success(news));
 };
 
@@ -288,15 +294,16 @@ exports.wordtree = async (req, res) => {
   logger.info('Search...');
   const { d_from, d_to, words, sources, page, limit } = req.query;
   const sources_arr = sources ? sources.split(',') : DEFAULT_ARRAY;
-  const news = await db.sequelize.query(
-    '\
-  SELECT "News"."title" \
-  FROM "News" INNER JOIN "Sources" ON "News"."sourceId"="Sources"."id" \
-  WHERE "News"."publicationDate" IS NOT NULL AND "News"."publicationDate" >= (:d_from) \
-  AND "News"."publicationDate" <= (:d_to) AND LOWER("News"."title") LIKE (:words) AND "Sources"."id" IN (:sources)\
-  ORDER BY "News"."id" ASC\
-  OFFSET (:offset) ROWS\
-  FETCH NEXT (:limit) ROWS ONLY',
+  const news = await db.sequelize
+    .query(
+      '\
+    SELECT "News"."title" \
+    FROM "News" INNER JOIN "Sources" ON "News"."sourceId"="Sources"."id" \
+    WHERE "News"."publicationDate" IS NOT NULL AND "News"."publicationDate" >= (:d_from) \
+    AND "News"."publicationDate" <= (:d_to) AND LOWER("News"."title") LIKE (:words) AND "Sources"."id" IN (:sources)\
+    ORDER BY "News"."id" ASC\
+    OFFSET (:offset) ROWS\
+    FETCH NEXT (:limit) ROWS ONLY',
     {
       replacements: {
         d_from: d_from ? d_from : getCurrentDate(),
@@ -307,8 +314,9 @@ exports.wordtree = async (req, res) => {
         limit
       },
       type: db.sequelize.QueryTypes.SELECT
-    }
-  ).catch(error => logger.info(error));
+      }
+    )
+    .catch(error => logger.info(error));
   return res.send(success(news));
 };
 
@@ -317,13 +325,14 @@ exports.wordcloud = async (req, res) => {
   logger.info('Word cloud...');
   const { d_from, d_to, words, sources, limit, stopwords } = req.query;
   const sources_arr = sources ? sources.split(',') : DEFAULT_ARRAY;
-  const news = await db.sequelize.query(
-    '\
-  SELECT "News"."title" \
-  FROM "News" INNER JOIN "Sources" ON "News"."sourceId"="Sources"."id" \
-  WHERE "News"."publicationDate" IS NOT NULL AND "News"."publicationDate" >= (:d_from) \
-  AND "News"."publicationDate" <= (:d_to) AND LOWER("News"."title") LIKE (:words) AND "Sources"."id" IN (:sources)\
-  ORDER BY "News"."id" ASC',
+  const news = await db.sequelize
+    .query(
+      '\
+    SELECT "News"."title" \
+    FROM "News" INNER JOIN "Sources" ON "News"."sourceId"="Sources"."id" \
+    WHERE "News"."publicationDate" IS NOT NULL AND "News"."publicationDate" >= (:d_from) \
+    AND "News"."publicationDate" <= (:d_to) AND LOWER("News"."title") LIKE (:words) AND "Sources"."id" IN (:sources)\
+    ORDER BY "News"."id" ASC',
     {
       replacements: {
         d_from: d_from ? d_from : getCurrentDate(),
@@ -333,7 +342,8 @@ exports.wordcloud = async (req, res) => {
       },
       type: db.sequelize.QueryTypes.SELECT
     }
-  ).catch(error => error);
+  )
+  .catch(error => logger.info(error));
   let response = [];
   for (let i = 0; i < news.length; i++) {
     const title = news[i].title
@@ -379,13 +389,14 @@ exports.trends = async (req, res) => {
   const sources_arr = sources ? sources.split(',') : DEFAULT_ARRAY;
   let words_arr = words ? words.split(',') : [];
   words_arr = words_arr.map(word => word.toLowerCase());
-  const news = await db.sequelize.query(
-    '\
-  SELECT "News"."title", "News"."publicationDate" AS "publication_date" \
-  FROM "News" INNER JOIN "Sources" ON "News"."sourceId"="Sources"."id" \
-  WHERE "News"."publicationDate" IS NOT NULL AND "News"."publicationDate" >= (:d_from) \
-  AND "News"."publicationDate" <= (:d_to) AND "Sources"."id" IN (:sources)\
-  ORDER BY "News"."publicationDate" ASC',
+  const news = await db.sequelize
+    .query(
+      '\
+    SELECT "News"."title", "News"."publicationDate" AS "publication_date" \
+    FROM "News" INNER JOIN "Sources" ON "News"."sourceId"="Sources"."id" \
+    WHERE "News"."publicationDate" IS NOT NULL AND "News"."publicationDate" >= (:d_from) \
+    AND "News"."publicationDate" <= (:d_to) AND "Sources"."id" IN (:sources)\
+    ORDER BY "News"."publicationDate" ASC',
     {
       replacements: {
         d_from: d_from ? d_from : getCurrentDate(),
@@ -394,7 +405,8 @@ exports.trends = async (req, res) => {
       },
       type: db.sequelize.QueryTypes.SELECT
     }
-  ).catch(error => logger.info(error));
+  )
+  .catch(error => logger.info(error));
   let response = [];
   let max_times = 0;
   for (let i = 0; i < news.length; i++) {
@@ -459,7 +471,8 @@ exports.deleteStopword = async (req, res) => {
     where: {
       word: req.query.word
     }
-  }).catch(error => logger.info(error));
+  })
+  .catch(error => logger.info(error));
   if (!stopword) {
     return res.status(400).send('Cannot find stopword');
   }
@@ -467,6 +480,7 @@ exports.deleteStopword = async (req, res) => {
     where: {
       word: req.query.word
     }
-  }).catch(error => logger.info(error));
+  })
+  .catch(error => logger.info(error));
   return res.send('Ok, deleted stopword');
 };
