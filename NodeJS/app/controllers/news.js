@@ -131,46 +131,46 @@ const extractEntities = async news => {
               program: 'NERD_API'
             }
           })
-          .then( async entity => {
-            await EntitiesNews.create({
-              entityId: entity.id,
-              newId: news.id
+            .then( async entity => {
+              await EntitiesNews.create({
+                entityId: entity.id,
+                newId: news.id
+              })
             })
-          })
-          .then(
-            await News.update(
-              { entitiesCalculated: true },
-              {
-                where: {
-                id: news.id
+            .then(
+              await News.update(
+                { entitiesCalculated: true },
+                {
+                  where: {
+                  id: news.id
+                  }
                 }
-              }
-            )
-          )
-        }
-      })
+              )
+            );
+          }
+      });
     } catch (error) {
       // Error 😨
-      if (error.response) {
+    if (error.response) {
         /*
          * The request was made and the server responded with a
          * status code that falls out of the range of 2xx
          */
-        logger.info(error.response.data);
-        logger.info(error.response.status);
-        logger.info(error.response.headers);
-      } else if (error.request) {
+      logger.info(error.response.data);
+      logger.info(error.response.status);
+      logger.info(error.response.headers);
+    } else if (error.request) {
         /*
          * The request was made but no response was received, `error.request`
          * is an instance of XMLHttpRequest in the browser and an instance
          * of http.ClientRequest in Node.js
          */
-        logger.info(error.request);
-      } else {
+      logger.info(error.request);
+    } else {
         // Something happened in setting up the request and triggered an Error
-        logger.info('Error', error.message);
-      }
-      logger.info(error);
+      logger.info('Error', error.message);
+    }
+    logger.info(error);
     }
 };
 
