@@ -62,7 +62,7 @@ exports.getEntities = async (req, res) => {
   const types_arr = types ? types.split(',') : DEFAULT_TYPES_ENTITIES;
   const sources_arr = sources ? sources.split(',') : DEFAULT_ARRAY;
   const entities = await db.sequelize.query(
-  '\
+      '\
   SELECT "Entities"."name" AS "entity", "Entities"."type", "Entities"."id", COUNT(*) AS quantity \
   FROM "Entities" INNER JOIN "EntitiesNews" ON "Entities"."id"="EntitiesNews"."entityId"\
   INNER JOIN "News" ON "EntitiesNews"."newId"="News"."id" \
@@ -72,17 +72,17 @@ exports.getEntities = async (req, res) => {
   AND "Sources"."id" IN (:sources)\
   GROUP BY "Entities"."id"\
   ORDER BY quantity DESC',
-      {
-        replacements: {
-          d_from: d_from ? d_from : getCurrentDate(),
-          d_to: d_to ? d_to : getCurrentDate(),
-          types: types_arr,
-          sources: sources_arr
-        },
-        type: db.sequelize.QueryTypes.SELECT
-      }
-    ).catch(error => logger.info(error));
-    return res.send(success(entities));
+    {
+      replacements: {
+        d_from: d_from ? d_from : getCurrentDate(),
+        d_to: d_to ? d_to : getCurrentDate(),
+        types: types_arr,
+        sources: sources_arr
+      },
+      type: db.sequelize.QueryTypes.SELECT
+    }).catch(error => logger.info(error));
+
+  return res.send(success(entities));
 };
 
 const extractEntities = async news => {
