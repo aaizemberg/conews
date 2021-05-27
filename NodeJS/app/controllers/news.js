@@ -108,7 +108,7 @@ const extractEntities = async news => {
     })
       .then(async resultNerd => {
         const { access_token } = resultNerd.data;
-        await axios({
+        const response = await axios({
           url: 'http://nerd.it.itba.edu.ar:80/api/ner/current/entities',
           method: 'post',
           headers: {
@@ -120,6 +120,7 @@ const extractEntities = async news => {
             text: news.title
           }
         });
+        return response;
       })
       .then(async response => {
         const { entities } = response.data;
@@ -193,8 +194,8 @@ const extractAllEntities = () => {
 };
 
 exports.extractPeriodicEntities = () => {
-  // 5 minutes past every hour
-  schedule.scheduleJob('5 * * * *', () => {
+  // 10 minutes past every hour
+  schedule.scheduleJob('10 * * * *', () => {
     extractAllEntities();
   });
   logger.info('Schedule for Entities created!');
