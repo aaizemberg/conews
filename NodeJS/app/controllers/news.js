@@ -53,7 +53,7 @@ const getPeriodicNewsJob = () => {
         }
       }
     })
-    .catch(error => error);
+    .catch(error => logger.info(error));
 };
 
 exports.getEntities = async (req, res) => {
@@ -61,18 +61,17 @@ exports.getEntities = async (req, res) => {
   const { d_from, d_to, types, sources } = req.query;
   const types_arr = types ? types.split(',') : DEFAULT_TYPES_ENTITIES;
   const sources_arr = sources ? sources.split(',') : DEFAULT_ARRAY;
-  try {
-    const entities = await db.sequelize.query(
-      '\
-        SELECT "Entities"."name" AS "entity", "Entities"."type", "Entities"."id", COUNT(*) AS quantity \
-        FROM "Entities" INNER JOIN "EntitiesNews" ON "Entities"."id"="EntitiesNews"."entityId"\
-        INNER JOIN "News" ON "EntitiesNews"."newId"="News"."id" \
-        INNER JOIN "Sources" ON "News"."sourceId"="Sources"."id" \
-        WHERE "News"."publicationDate" IS NOT NULL AND "News"."publicationDate" >= (:d_from) \
-        AND "News"."publicationDate" <= (:d_to) AND "Entities"."type" IN (:types)\
-        AND "Sources"."id" IN (:sources)\
-        GROUP BY "Entities"."id"\
-        ORDER BY quantity DESC',
+  const entities = await db.sequelize.query(
+  '\
+  SELECT "Entities"."name" AS "entity", "Entities"."type", "Entities"."id", COUNT(*) AS quantity \
+  FROM "Entities" INNER JOIN "EntitiesNews" ON "Entities"."id"="EntitiesNews"."entityId"\
+  INNER JOIN "News" ON "EntitiesNews"."newId"="News"."id" \
+  INNER JOIN "Sources" ON "News"."sourceId"="Sources"."id" \
+  WHERE "News"."publicationDate" IS NOT NULL AND "News"."publicationDate" >= (:d_from) \
+  AND "News"."publicationDate" <= (:d_to) AND "Entities"."type" IN (:types)\
+  AND "Sources"."id" IN (:sources)\
+  GROUP BY "Entities"."id"\
+  ORDER BY quantity DESC',
       {
         replacements: {
           d_from: d_from ? d_from : getCurrentDate(),
@@ -82,13 +81,8 @@ exports.getEntities = async (req, res) => {
         },
         type: db.sequelize.QueryTypes.SELECT
       }
-    );
-
+    ).catch(error => logger.info(error));
     return res.send(success(entities));
-  } catch (error) {
-    logger.info(error);
-  }
-  return res.send("Finished getting entities");
 };
 
 const extractEntities = async news => {
@@ -97,7 +91,7 @@ const extractEntities = async news => {
   //  TODO: credentials shouldn't be stored within code
 
   try {
-    const resultNerd = await axios({
+    await axios({
       url: 'http://nerd.it.itba.edu.ar:80/api/auth/token',
       method: 'post',
       headers: {
@@ -109,55 +103,46 @@ const extractEntities = async news => {
         username: 'nerdapi@mailinator.com',
         password: 'p455w0rd'
       }
-    });
-
-    const { access_token } = resultNerd.data;
-
-    try {
+    }).then(async resultNerd => {
       await axios({
         url: 'http://nerd.it.itba.edu.ar:80/api/ner/current/entities',
         method: 'post',
         headers: {
           accept: 'application/json',
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${access_token}`
+          Authorization: `Bearer ${resultNerd.data}`
         },
         data: {
           text: news.title
         }
       })
-          .then(async response => {
-            const { data } = response;
-            for (let i = 0; i < data.entities.length; i++) {
-              data.entities[i].name = news.title.slice(data.entities[i].start, data.entities[i].end);
-              const [entity] = await Entities.findOrCreate({
-                where: {
-                  name: data.entities[i].name,
-                  type: data.entities[i].label,
-                  field: 'TITLE',
-                  program: 'NERD_API'
-                }
-              }).then(
-                  await EntitiesNews.create({
-                  entityId: entity.id,
-                  newId: news.id
-                  }).then(
-                    await News.update(
-                      { entitiesCalculated: true },
-                      {
-                        where: {
-                          id: news.id
-                        }
-                      }
-                    ).catch(error => logger.info(error))
-                  ).catch(error => logger.info(error))
-              ).catch(error => logger.info(error));
-            }
-            return data.entities;
+    }).then(async data => {
+      for (let i = 0; i < data.entities.length; i++) {
+        data.entities[i].name = news.title.slice(data.entities[i].start, data.entities[i].end);
+        await Entities.findOrCreate({
+          where: {
+            name: data.entities[i].name,
+            type: data.entities[i].label,
+            field: 'TITLE',
+            program: 'NERD_API'
+          }
+        }).then( async entity => {
+          await EntitiesNews.create({
+            entityId: entity.id,
+            newId: news.id
           })
-          .catch(error => {
-            logger.info(error);
-          });
+        }).then(
+          await News.update(
+            { entitiesCalculated: true },
+            {
+              where: {
+              id: news.id
+              }
+            }
+          )
+        )
+      }
+    })
     } catch (error) {
       // Error 😨
       if (error.response) {
@@ -181,29 +166,6 @@ const extractEntities = async news => {
       }
       logger.info(error);
     }
-  } catch (error) {
-    // Error 😨
-    if (error.response) {
-      /*
-       * The request was made and the server responded with a
-       * status code that falls out of the range of 2xx
-       */
-      logger.info(error.response.data);
-      logger.info(error.response.status);
-      logger.info(error.response.headers);
-    } else if (error.request) {
-      /*
-       * The request was made but no response was received, `error.request`
-       * is an instance of XMLHttpRequest in the browser and an instance
-       * of http.ClientRequest in Node.js
-       */
-      logger.info(error.request);
-    } else {
-      // Something happened in setting up the request and triggered an Error
-      logger.info('Error', error.message);
-    }
-    logger.info(error);
-  }
 };
 
 const extractAllEntities = () => {
@@ -212,14 +174,9 @@ const extractAllEntities = () => {
     where: {
       entitiesCalculated: false
     }
-  })
-    .then(async news => {
+  }).then(async news => {
       for (let i = 0; i < news.length; i++) {
-        try {
           await extractEntities(news[i]);
-        } catch (error) {
-          logger.info(error);
-        }
       }
       logger.info('Extracting all entities finished');
     })
