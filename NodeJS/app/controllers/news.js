@@ -61,31 +61,34 @@ exports.getEntities = async (req, res) => {
   const { d_from, d_to, types, sources } = req.query;
   const types_arr = types ? types.split(',') : DEFAULT_TYPES_ENTITIES;
   const sources_arr = sources ? sources.split(',') : DEFAULT_ARRAY;
-  const entities = await db.sequelize.query(
-    '\
-    SELECT "Entities"."name" AS "entity", "Entities"."type", "Entities"."id", COUNT(*) AS quantity \
-    FROM "Entities" INNER JOIN "EntitiesNews" ON "Entities"."id"="EntitiesNews"."entityId"\
-    INNER JOIN "News" ON "EntitiesNews"."newId"="News"."id" \
-    INNER JOIN "Sources" ON "News"."sourceId"="Sources"."id" \
-    WHERE "News"."publicationDate" IS NOT NULL AND "News"."publicationDate" >= (:d_from) \
-    AND "News"."publicationDate" <= (:d_to) AND "Entities"."type" IN (:types)\
-    AND "Sources"."id" IN (:sources)\
-    GROUP BY "Entities"."id"\
-    ORDER BY quantity DESC',
-    {
-      replacements: {
-        d_from: d_from ? d_from : getCurrentDate(),
-        d_to: d_to ? d_to : getCurrentDate(),
-        types: types_arr,
-        sources: sources_arr
-      },
-      type: db.sequelize.QueryTypes.SELECT
-    }
-  ).catch(error => error);
-  /* const entities = await Entities.findAll({
-    attributes: [['name', 'entity'], 'type', 'id']
-  });*/
-  return res.send(success(entities));
+  try {
+    const entities = await db.sequelize.query(
+        '\
+        SELECT "Entities"."name" AS "entity", "Entities"."type", "Entities"."id", COUNT(*) AS quantity \
+        FROM "Entities" INNER JOIN "EntitiesNews" ON "Entities"."id"="EntitiesNews"."entityId"\
+        INNER JOIN "News" ON "EntitiesNews"."newId"="News"."id" \
+        INNER JOIN "Sources" ON "News"."sourceId"="Sources"."id" \
+        WHERE "News"."publicationDate" IS NOT NULL AND "News"."publicationDate" >= (:d_from) \
+        AND "News"."publicationDate" <= (:d_to) AND "Entities"."type" IN (:types)\
+        AND "Sources"."id" IN (:sources)\
+        GROUP BY "Entities"."id"\
+        ORDER BY quantity DESC',
+        {
+          replacements: {
+            d_from: d_from ? d_from : getCurrentDate(),
+            d_to: d_to ? d_to : getCurrentDate(),
+            types: types_arr,
+            sources: sources_arr
+          },
+          type: db.sequelize.QueryTypes.SELECT
+        }
+    )
+
+    return res.send(success(entities));
+
+  } catch (error) {
+    logger.info(error);
+  }
 };
 
 const extractEntities = async news => {
@@ -93,104 +96,68 @@ const extractEntities = async news => {
 
   //  TODO: credentials shouldn't be stored within code
 
-  if (!news.entitiesCalculated) {
+  try {
+    const resultNerd = await axios({
+      url: 'http://nerd.it.itba.edu.ar:80/api/auth/token',
+      method: 'post',
+      headers: {
+        accept: 'application/json',
+        'Content-Type': 'application/json'
+      },
+      data: {
+        grant_type: 'password',
+        username: 'nerdapi@mailinator.com',
+        password: 'p455w0rd'
+      }
+    });
+
+    const { access_token } = resultNerd.data;
+
     try {
-      const resultNerd = await axios({
-        url: 'http://nerd.it.itba.edu.ar:80/api/auth/token',
+      await axios({
+        url: 'http://nerd.it.itba.edu.ar:80/api/ner/current/entities',
         method: 'post',
         headers: {
           accept: 'application/json',
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${access_token}`
         },
         data: {
-          grant_type: 'password',
-          username: 'nerdapi@mailinator.com',
-          password: 'p455w0rd'
+          text: news.title
         }
-      });
-
-      const { access_token } = resultNerd.data;
-
-      try {
-        await axios({
-          url: 'http://nerd.it.itba.edu.ar:80/api/ner/current/entities',
-          method: 'post',
-          headers: {
-            accept: 'application/json',
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${access_token}`
-          },
-          data: {
-            text: news.title
-          }
-        })
-            .then(async response => {
-              const { data } = response;
-              for (let i = 0; i < data.entities.length; i++) {
-                data.entities[i].name = news.title.slice(data.entities[i].start, data.entities[i].end);
-                const [entity] = await Entities.findOrCreate({
-                  where: {
-                    name: data.entities[i].name,
-                    type: data.entities[i].label,
-                    field: 'TITLE',
-                    program: 'NERD_API'
-                  }
-                })
-                .catch(error => error);
-
-                await EntitiesNews.create({
+      })
+          .then(async response => {
+            const { data } = response;
+            for (let i = 0; i < data.entities.length; i++) {
+              data.entities[i].name = news.title.slice(data.entities[i].start, data.entities[i].end);
+              const [entity] = await Entities.findOrCreate({
+                where: {
+                  name: data.entities[i].name,
+                  type: data.entities[i].label,
+                  field: 'TITLE',
+                  program: 'NERD_API'
+                }
+              }).then(
+                  await EntitiesNews.create({
                   entityId: entity.id,
                   newId: news.id
-                })
-                .catch(error => error);
-              }
-              const { count } = await EntitiesNews.findAndCountAll({
-                where: {
-                  newId: news.id
-                }
-              }).catch(error => error);
-              if (data.entities.length === count) {
-                try {
-                  await News.update(
+                  }).then(
+                    await News.update(
                       { entitiesCalculated: true },
                       {
                         where: {
                           id: news.id
                         }
                       }
-                  );
-                } catch (error) {
-                  logger.info(error);
-                }
-              }
-              return data.entities;
-            })
-            .catch(error => {
-              logger.info(error);
-            });
-      } catch (error) {
-        // Error 😨
-        if (error.response) {
-          /*
-           * The request was made and the server responded with a
-           * status code that falls out of the range of 2xx
-           */
-          logger.info(error.response.data);
-          logger.info(error.response.status);
-          logger.info(error.response.headers);
-        } else if (error.request) {
-          /*
-           * The request was made but no response was received, `error.request`
-           * is an instance of XMLHttpRequest in the browser and an instance
-           * of http.ClientRequest in Node.js
-           */
-          logger.info(error.request);
-        } else {
-          // Something happened in setting up the request and triggered an Error
-          logger.info('Error', error.message);
-        }
-        logger.info(error);
-      }
+                    ).catch(error => logger.info(error))
+                  ).catch(error => logger.info(error))
+              ).catch(error => logger.info(error));
+            }
+            return data.entities;
+          })
+          .catch(error => {
+            logger.info(error);
+          });
     } catch (error) {
       // Error 😨
       if (error.response) {
@@ -214,12 +181,38 @@ const extractEntities = async news => {
       }
       logger.info(error);
     }
+  } catch (error) {
+    // Error 😨
+    if (error.response) {
+      /*
+       * The request was made and the server responded with a
+       * status code that falls out of the range of 2xx
+       */
+      logger.info(error.response.data);
+      logger.info(error.response.status);
+      logger.info(error.response.headers);
+    } else if (error.request) {
+      /*
+       * The request was made but no response was received, `error.request`
+       * is an instance of XMLHttpRequest in the browser and an instance
+       * of http.ClientRequest in Node.js
+       */
+      logger.info(error.request);
+    } else {
+      // Something happened in setting up the request and triggered an Error
+      logger.info('Error', error.message);
+    }
+    logger.info(error);
   }
 };
 
 const extractAllEntities = () => {
   logger.info('Extracting all entities...');
-  return News.findAll()
+  return News.findAll({
+    where: {
+      entitiesCalculated: false
+    }
+  })
     .then(async news => {
       for (let i = 0; i < news.length; i++) {
         try {
@@ -230,7 +223,7 @@ const extractAllEntities = () => {
       }
       logger.info('Extracting all entities finished');
     })
-    .catch(error => error);
+    .catch(error => logger.info(error));
 };
 
 exports.extractPeriodicEntities = () => {
@@ -270,7 +263,7 @@ exports.getNewsQuantitySQL = async (req, res) => {
       },
       type: db.sequelize.QueryTypes.SELECT
     }
-  ).catch(error => error);
+  ).catch(error => logger.info(error));
   return res.send(success(news));
 };
 
@@ -295,7 +288,7 @@ exports.heatmapSQL = async (req, res) => {
       },
       type: db.sequelize.QueryTypes.SELECT
     }
-  ).catch(error => error);
+  ).catch(error => logger.info(error));
   return res.send(success(news));
 };
 
@@ -323,7 +316,7 @@ exports.searchSQL = async (req, res) => {
       },
       type: db.sequelize.QueryTypes.SELECT
     }
-  ).catch(error => error);
+  ).catch(error => logger.info(error));
   return res.send(success(news));
 };
 
@@ -351,7 +344,7 @@ exports.wordtree = async (req, res) => {
       },
       type: db.sequelize.QueryTypes.SELECT
     }
-  ).catch(error => error);
+  ).catch(error => logger.info(error));
   return res.send(success(news));
 };
 
@@ -437,7 +430,7 @@ exports.trends = async (req, res) => {
       },
       type: db.sequelize.QueryTypes.SELECT
     }
-  ).catch(error => error);
+  ).catch(error => logger.info(error));
   let response = [];
   let max_times = 0;
   for (let i = 0; i < news.length; i++) {
@@ -488,12 +481,12 @@ exports.trends = async (req, res) => {
 exports.insertStopword = async (req, res) => {
   await Stopwords.create({
     word: req.query.word
-  }).catch(error => error);
+  }).catch(error => logger.info(error));
   return res.send('Ok, inserted stopword');
 };
 
 exports.getStopwords = async (req, res) => {
-  const response = await Stopwords.findAll().catch(error => error);
+  const response = await Stopwords.findAll().catch(error => logger.info(error));
   return res.send(response);
 };
 
@@ -502,7 +495,7 @@ exports.deleteStopword = async (req, res) => {
     where: {
       word: req.query.word
     }
-  }).catch(error => error);
+  }).catch(error => logger.info(error));
   if (!stopword) {
     return res.status(400).send('Cannot find stopword');
   }
@@ -510,6 +503,6 @@ exports.deleteStopword = async (req, res) => {
     where: {
       word: req.query.word
     }
-  }).catch(error => error);
+  }).catch(error => logger.info(error));
   return res.send('Ok, deleted stopword');
 };
