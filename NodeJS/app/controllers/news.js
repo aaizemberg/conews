@@ -113,7 +113,7 @@ const extractEntities = async news => {
           headers: {
             accept: 'application/json',
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${resultNerd.data}`
+            Authorization: `Bearer ${resultNerd.data.access_token}`
           },
           data: {
             text: news.title
@@ -191,8 +191,8 @@ const extractAllEntities = () => {
 };
 
 exports.extractPeriodicEntities = () => {
-  // 15 minutes past every hour
-  schedule.scheduleJob('15 * * * *', () => {
+  // 40 minutes past every hour
+  schedule.scheduleJob('40 * * * *', () => {
     extractAllEntities();
   });
   logger.info('Schedule for Entities created!');
