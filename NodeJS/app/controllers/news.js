@@ -122,13 +122,13 @@ const extractEntities = async news => {
         });
       })
       .then(async response => {
-        const { data } = response;
-        for (let i = 0; i < data.entities.length; i++) {
-          data.entities[i].name = news.title.slice(data.entities[i].start, data.entities[i].end);
+        const { entities } = response.data;
+        for (let i = 0; i < entities.length; i++) {
+          entities[i].name = news.title.slice(entities[i].start, entities[i].end);
           await Entities.findOrCreate({
             where: {
-              name: data.entities[i].name,
-              type: data.entities[i].label,
+              name: entities[i].name,
+              type: entities[i].label,
               field: 'TITLE',
               program: 'NERD_API'
             }
@@ -193,8 +193,8 @@ const extractAllEntities = () => {
 };
 
 exports.extractPeriodicEntities = () => {
-  // 50 minutes past every hour
-  schedule.scheduleJob('50 * * * *', () => {
+  // 5 minutes past every hour
+  schedule.scheduleJob('5 * * * *', () => {
     extractAllEntities();
   });
   logger.info('Schedule for Entities created!');
