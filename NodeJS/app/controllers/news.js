@@ -219,15 +219,15 @@ exports.getNewsQuantitySQL = async (req, res) => {
       AND "News"."publicationDate" <= (:d_to) AND LOWER("News"."title") LIKE (:words) AND "Sources"."id" IN (:sources)\
       GROUP BY "News"."publicationDate"\
       ORDER BY "News"."publicationDate" DESC',
-        {
-          replacements: {
-            d_from: d_from ? d_from : getCurrentDate(),
-            d_to: d_to ? d_to : getCurrentDate(),
-            words: words ? `%${words.toLowerCase()}%` : '%',
-            sources: sources_arr
-          },
-          type: db.sequelize.QueryTypes.SELECT
-        }
+      {
+        replacements: {
+          d_from: d_from ? d_from : getCurrentDate(),
+          d_to: d_to ? d_to : getCurrentDate(),
+          words: words ? `%${words.toLowerCase()}%` : '%',
+          sources: sources_arr
+        },
+        type: db.sequelize.QueryTypes.SELECT
+      }
     )
     .catch(error => logger.info(error));
   return res.send(success(news));
@@ -274,16 +274,16 @@ exports.searchSQL = async (req, res) => {
     ORDER BY "News"."id" ASC\
     OFFSET (:offset) ROWS\
     FETCH NEXT (:limit) ROWS ONLY',
-    {
-      replacements: {
-        d_from: d_from ? d_from : getCurrentDate(),
-        d_to: d_to ? d_to : getCurrentDate(),
-        words: words ? `%${words.toLowerCase()}%` : '%',
-        sources: sources_arr,
-        offset: (page - 1) * limit,
-        limit
-      },
-      type: db.sequelize.QueryTypes.SELECT
+      {
+        replacements: {
+          d_from: d_from ? d_from : getCurrentDate(),
+          d_to: d_to ? d_to : getCurrentDate(),
+          words: words ? `%${words.toLowerCase()}%` : '%',
+          sources: sources_arr,
+          offset: (page - 1) * limit,
+          limit
+        },
+        type: db.sequelize.QueryTypes.SELECT
       }
     )
     .catch(error => logger.info(error));
@@ -304,16 +304,16 @@ exports.wordtree = async (req, res) => {
     ORDER BY "News"."id" ASC\
     OFFSET (:offset) ROWS\
     FETCH NEXT (:limit) ROWS ONLY',
-    {
-      replacements: {
-        d_from: d_from ? d_from : getCurrentDate(),
-        d_to: d_to ? d_to : getCurrentDate(),
-        words: words ? `%${words.toLowerCase()}%` : '%',
-        sources: sources_arr,
-        offset: (page - 1) * limit,
-        limit
-      },
-      type: db.sequelize.QueryTypes.SELECT
+      {
+        replacements: {
+          d_from: d_from ? d_from : getCurrentDate(),
+          d_to: d_to ? d_to : getCurrentDate(),
+          words: words ? `%${words.toLowerCase()}%` : '%',
+          sources: sources_arr,
+          offset: (page - 1) * limit,
+          limit
+        },
+        type: db.sequelize.QueryTypes.SELECT
       }
     )
     .catch(error => logger.info(error));
@@ -333,17 +333,17 @@ exports.wordcloud = async (req, res) => {
     WHERE "News"."publicationDate" IS NOT NULL AND "News"."publicationDate" >= (:d_from) \
     AND "News"."publicationDate" <= (:d_to) AND LOWER("News"."title") LIKE (:words) AND "Sources"."id" IN (:sources)\
     ORDER BY "News"."id" ASC',
-    {
-      replacements: {
-        d_from: d_from ? d_from : getCurrentDate(),
-        d_to: d_to ? d_to : getCurrentDate(),
-        words: words ? `%${words.toLowerCase()}%` : '%',
-        sources: sources_arr
-      },
-      type: db.sequelize.QueryTypes.SELECT
-    }
-  )
-  .catch(error => logger.info(error));
+      {
+        replacements: {
+          d_from: d_from ? d_from : getCurrentDate(),
+          d_to: d_to ? d_to : getCurrentDate(),
+          words: words ? `%${words.toLowerCase()}%` : '%',
+          sources: sources_arr
+        },
+        type: db.sequelize.QueryTypes.SELECT
+      }
+    )
+    .catch(error => logger.info(error));
   let response = [];
   for (let i = 0; i < news.length; i++) {
     const title = news[i].title
@@ -397,16 +397,16 @@ exports.trends = async (req, res) => {
     WHERE "News"."publicationDate" IS NOT NULL AND "News"."publicationDate" >= (:d_from) \
     AND "News"."publicationDate" <= (:d_to) AND "Sources"."id" IN (:sources)\
     ORDER BY "News"."publicationDate" ASC',
-    {
-      replacements: {
-        d_from: d_from ? d_from : getCurrentDate(),
-        d_to: d_to ? d_to : getCurrentDate(),
-        sources: sources_arr
-      },
-      type: db.sequelize.QueryTypes.SELECT
-    }
-  )
-  .catch(error => logger.info(error));
+      {
+        replacements: {
+          d_from: d_from ? d_from : getCurrentDate(),
+          d_to: d_to ? d_to : getCurrentDate(),
+          sources: sources_arr
+        },
+        type: db.sequelize.QueryTypes.SELECT
+      }
+    )
+    .catch(error => logger.info(error));
   let response = [];
   let max_times = 0;
   for (let i = 0; i < news.length; i++) {
@@ -471,7 +471,8 @@ exports.deleteStopword = async (req, res) => {
     where: {
       word: req.query.word
     }
-  })
+  }
+  )
   .catch(error => logger.info(error));
   if (!stopword) {
     return res.status(400).send('Cannot find stopword');
@@ -480,7 +481,8 @@ exports.deleteStopword = async (req, res) => {
     where: {
       word: req.query.word
     }
-  })
+  }
+  )
   .catch(error => logger.info(error));
   return res.send('Ok, deleted stopword');
 };
