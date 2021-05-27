@@ -10,8 +10,7 @@ const { getSources } = require('./controllers/sources'),
     insertStopword,
     getStopwords,
     deleteStopword,
-    getEntities,
-    changeEntities
+    getEntities
   } = require('./controllers/news'),
   { login, addUser } = require('./controllers/user'),
   { validateSchema } = require('./middlewares/common'),
@@ -40,5 +39,4 @@ exports.init = app => {
   app.post(`${API_BASE_URL}/login`, [validateSchema(schemas.userSignIn)], login);
   app.post(`${API_BASE_URL}/user`, [validateSchema(schemas.userSignUp)], addUser);
   app.get(`${API_BASE_URL}/entidades`, getEntities);
-  app.get(`${API_BASE_URL}/change`, changeEntities);
 };
