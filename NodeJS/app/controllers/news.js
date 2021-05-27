@@ -81,7 +81,8 @@ exports.getEntities = async (req, res) => {
           sources: sources_arr
         },
         type: db.sequelize.QueryTypes.SELECT
-      })
+      }
+    )
     .catch(error => logger.info(error));
   return res.send(success(entities));
 };
@@ -104,7 +105,8 @@ const extractEntities = async news => {
         username: 'nerdapi@mailinator.com',
         password: 'p455w0rd'
       }
-    }).then(async resultNerd => {
+    })
+    .then(async resultNerd => {
       await axios({
         url: 'http://nerd.it.itba.edu.ar:80/api/ner/current/entities',
         method: 'post',
@@ -117,7 +119,8 @@ const extractEntities = async news => {
           text: news.title
         }
       })
-    }).then(async data => {
+    })
+    .then(async data => {
       for (let i = 0; i < data.entities.length; i++) {
         data.entities[i].name = news.title.slice(data.entities[i].start, data.entities[i].end);
         await Entities.findOrCreate({
@@ -127,12 +130,14 @@ const extractEntities = async news => {
             field: 'TITLE',
             program: 'NERD_API'
           }
-        }).then( async entity => {
+        })
+        .then( async entity => {
           await EntitiesNews.create({
             entityId: entity.id,
             newId: news.id
           })
-        }).then(
+        })
+        .then(
           await News.update(
             { entitiesCalculated: true },
             {
@@ -175,13 +180,14 @@ const extractAllEntities = () => {
     where: {
       entitiesCalculated: false
     }
-  }).then(async news => {
+  })
+  .then(async news => {
       for (let i = 0; i < news.length; i++) {
           await extractEntities(news[i]);
       }
       logger.info('Extracting all entities finished');
     })
-    .catch(error => logger.info(error));
+  .catch(error => logger.info(error));
 };
 
 exports.extractPeriodicEntities = () => {
