@@ -63,15 +63,15 @@ exports.getEntities = async (req, res) => {
   const sources_arr = sources ? sources.split(',') : DEFAULT_ARRAY;
   const entities = await db.sequelize.query(
       '\
-  SELECT "Entities"."name" AS "entity", "Entities"."type", "Entities"."id", COUNT(*) AS quantity \
-  FROM "Entities" INNER JOIN "EntitiesNews" ON "Entities"."id"="EntitiesNews"."entityId"\
-  INNER JOIN "News" ON "EntitiesNews"."newId"="News"."id" \
-  INNER JOIN "Sources" ON "News"."sourceId"="Sources"."id" \
-  WHERE "News"."publicationDate" IS NOT NULL AND "News"."publicationDate" >= (:d_from) \
-  AND "News"."publicationDate" <= (:d_to) AND "Entities"."type" IN (:types)\
-  AND "Sources"."id" IN (:sources)\
-  GROUP BY "Entities"."id"\
-  ORDER BY quantity DESC',
+    SELECT "Entities"."name" AS "entity", "Entities"."type", "Entities"."id", COUNT(*) AS quantity \
+    FROM "Entities" INNER JOIN "EntitiesNews" ON "Entities"."id"="EntitiesNews"."entityId"\
+    INNER JOIN "News" ON "EntitiesNews"."newId"="News"."id" \
+    INNER JOIN "Sources" ON "News"."sourceId"="Sources"."id" \
+    WHERE "News"."publicationDate" IS NOT NULL AND "News"."publicationDate" >= (:d_from) \
+    AND "News"."publicationDate" <= (:d_to) AND "Entities"."type" IN (:types)\
+    AND "Sources"."id" IN (:sources)\
+    GROUP BY "Entities"."id"\
+    ORDER BY quantity DESC',
     {
       replacements: {
         d_from: d_from ? d_from : getCurrentDate(),
