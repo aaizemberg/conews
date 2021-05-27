@@ -471,8 +471,7 @@ exports.deleteStopword = async (req, res) => {
     where: {
       word: req.query.word
     }
-  })
-    .catch(error => logger.info(error));
+  }).catch(error => logger.info(error));
   if (!stopword) {
     return res.status(400).send('Cannot find stopword');
   }
@@ -480,7 +479,6 @@ exports.deleteStopword = async (req, res) => {
     where: {
       word: req.query.word
     }
-  })
-    .catch(error => logger.info(error));
+  }).catch(error => logger.info(error));
   return res.send('Ok, deleted stopword');
 };
