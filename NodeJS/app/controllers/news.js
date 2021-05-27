@@ -61,8 +61,9 @@ exports.getEntities = async (req, res) => {
   const { d_from, d_to, types, sources } = req.query;
   const types_arr = types ? types.split(',') : DEFAULT_TYPES_ENTITIES;
   const sources_arr = sources ? sources.split(',') : DEFAULT_ARRAY;
-  const entities = await db.sequelize.query(
-'\
+  const entities = await db.sequelize
+    .query(
+    '\
     SELECT "Entities"."name" AS "entity", "Entities"."type", "Entities"."id", COUNT(*) AS quantity \
     FROM "Entities" INNER JOIN "EntitiesNews" ON "Entities"."id"="EntitiesNews"."entityId"\
     INNER JOIN "News" ON "EntitiesNews"."newId"="News"."id" \
@@ -80,8 +81,9 @@ exports.getEntities = async (req, res) => {
         sources: sources_arr
       },
       type: db.sequelize.QueryTypes.SELECT
-    }).catch(error => logger.info(error));
-
+    })
+    .catch(error => logger.info(error));
+  
   return res.send(success(entities));
 };
 
