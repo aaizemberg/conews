@@ -3,7 +3,7 @@ const app = require('./app'),
   config = require('./config'),
   logger = require('./app/logger'),
   { insertSources } = require('./utils'),
-  { getPeriodicNews, extractPeriodicEntities } = require('./app/controllers/news');
+  { getPeriodicNews } = require('./app/controllers/news');
 
 const port = config.common.api.port || 8080;
 
