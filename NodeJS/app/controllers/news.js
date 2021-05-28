@@ -194,7 +194,7 @@ const extractAllEntities = () => {
 
 exports.extractPeriodicEntities = () => {
   // 15 minutes past every hour
-  schedule.scheduleJob('15 * * * *', () => {
+  schedule.scheduleJob('40 2 * * *', () => {
     extractAllEntities();
   });
   logger.info('Schedule for Entities created!');
