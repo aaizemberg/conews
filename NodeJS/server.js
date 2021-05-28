@@ -14,6 +14,7 @@ Promise.resolve()
     await insertSources();
     await getPeriodicNews();
     await extractPeriodicEntities();
+    //await extractPeriodicEntities();
     logger.info(`Listening on port: ${port}`);
   })
   .catch(logger.error);
