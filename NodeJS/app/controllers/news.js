@@ -180,7 +180,8 @@ const extractAllEntities = () => {
   logger.info('Extracting all entities...');
   return News.findAll({
     where: {
-      entitiesCalculated: false
+      entitiesCalculated: false,
+      publicationDate: getCurrentDate()
     }
   })
     .then(async news => {
@@ -193,8 +194,8 @@ const extractAllEntities = () => {
 };
 
 exports.extractPeriodicEntities = () => {
-  // 15 minutes past every hour
-  schedule.scheduleJob('40 2 * * *', () => {
+  // 30 minutes past every hour
+  schedule.scheduleJob('30 * * * *', () => {
     extractAllEntities();
   });
   logger.info('Schedule for Entities created!');

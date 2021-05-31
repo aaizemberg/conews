@@ -3,7 +3,7 @@ const app = require('./app'),
   config = require('./config'),
   logger = require('./app/logger'),
   { insertSources } = require('./utils'),
-  { getPeriodicNews } = require('./app/controllers/news');
+  { getPeriodicNews, extractPeriodicEntities } = require('./app/controllers/news');
 
 const port = config.common.api.port || 8080;
 
@@ -13,7 +13,7 @@ Promise.resolve()
     app.listen(port);
     await insertSources();
     await getPeriodicNews();
-    // await extractPeriodicEntities();
+    await extractPeriodicEntities();
     logger.info(`Listening on port: ${port}`);
   })
   .catch(logger.error);
