@@ -126,18 +126,17 @@ const extractEntities = async news => {
         const { entities } = response.data;
         for (let i = 0; i < entities.length; i++) {
           entities[i].name = news.title.slice(entities[i].start, entities[i].end);
-          await Entities.findOrCreate({
+          const [entity] = await Entities.findOrCreate({
             where: {
               name: entities[i].name,
               type: entities[i].label,
               field: 'TITLE',
               program: 'NERD_API'
             }
-          }).then(async entity => {
-            await EntitiesNews.create({
+          })
+          await EntitiesNews.create({
               entityId: entity.id,
               newId: news.id
-            });
           });
         }
       })
