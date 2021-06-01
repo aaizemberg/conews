@@ -133,10 +133,10 @@ const extractEntities = async news => {
               field: 'TITLE',
               program: 'NERD_API'
             }
-          })
+          });
           await EntitiesNews.create({
-              entityId: entity.id,
-              newId: news.id
+            entityId: entity.id,
+            newId: news.id
           });
         }
       })
