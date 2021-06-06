@@ -28,24 +28,22 @@ const getPeriodicNewsJob = () => {
             }
           );
           response.items.map(async item => {
-            const news = await News.findOne({
-              where: {
-                url: item.link,
-                title: item.title.split(' - ')[0]
-              }
-            });
-            if (!news) {
-              const { title, link, pubDate } = item;
-              if (link.startsWith(sources[i].url)) {
-                const itemTitle = title.split(' - ')[0];
-                await News.create({
+            const { title, link, pubDate } = item;
+            if (link.startsWith(sources[i].url)) {
+              const itemTitle = title.split(' - ')[0];
+              await News.findOrCreate({
+                where: {
+                  url: item.link,
+                  title: item.title.split(' - ')[0]
+                },
+                defaults: {
                   title: itemTitle,
                   url: link,
                   publicationDate: getDate(new Date(pubDate)),
                   content: itemTitle,
                   sourceId: sources[i].id
-                });
-              }
+                }
+              });
             }
           });
         } catch (error) {
