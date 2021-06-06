@@ -153,10 +153,10 @@ const extractEntities = async news => {
             { entitiesCalculated: true },
             {
               where: {
-              id: news.id
+                id: news.id
               }
             }
-          )
+          );
         }
       });
   } catch (error) {
