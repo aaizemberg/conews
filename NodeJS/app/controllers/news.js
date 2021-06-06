@@ -106,7 +106,9 @@ const extractEntities = async news => {
     })
       .then(async resultNerd => {
         const { access_token } = resultNerd.data;
-        if (access_token != null) {
+        if (access_token === null && access_token === undefined) {
+          throw new Error('Login failed');
+        } else {
           const response = await axios({
             url: 'http://nerd.it.itba.edu.ar:80/api/ner/current/entities',
             method: 'post',
@@ -120,13 +122,13 @@ const extractEntities = async news => {
             }
           });
           return response;
-        } else {
-          throw new Error('Login failed');
         }
       })
       .then(async response => {
         const { entities } = response.data;
-        if (entities != null) {
+        if (entities === null && entities === undefined) {
+          throw new Error('Nerd API is not returning any valid entity');
+        } else {
           for (let i = 0; i < entities.length; i++) {
             entities[i].name = news.title.slice(entities[i].start, entities[i].end);
             const [entity] = await Entities.findOrCreate({
@@ -143,12 +145,10 @@ const extractEntities = async news => {
             });
           }
           return entities;
-        } else {
-          throw new Error('Nerd API is not returning any valid entity');
         }
       })
       .then(async response => {
-        if (response != null) {
+        if (response !== null && response !== undefined) {
           await News.update(
             { entitiesCalculated: true },
             {
