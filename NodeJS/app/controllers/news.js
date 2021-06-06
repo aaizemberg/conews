@@ -106,48 +106,55 @@ const extractEntities = async news => {
     })
       .then(async resultNerd => {
         const { access_token } = resultNerd.data;
-        const response = await axios({
-          url: 'http://nerd.it.itba.edu.ar:80/api/ner/current/entities',
-          method: 'post',
-          headers: {
-            accept: 'application/json',
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${access_token}`
-          },
-          data: {
-            text: news.title
-          }
-        });
-        return response;
+        if (access_token != null) {
+          const response = await axios({
+            url: 'http://nerd.it.itba.edu.ar:80/api/ner/current/entities',
+            method: 'post',
+            headers: {
+              accept: 'application/json',
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${access_token}`
+            },
+            data: {
+              text: news.title
+            }
+          });
+          return response;
+        }
       })
       .then(async response => {
         const { entities } = response.data;
-        for (let i = 0; i < entities.length; i++) {
-          entities[i].name = news.title.slice(entities[i].start, entities[i].end);
-          const [entity] = await Entities.findOrCreate({
-            where: {
-              name: entities[i].name,
-              type: entities[i].label,
-              field: 'TITLE',
-              program: 'NERD_API'
-            }
-          });
-          await EntitiesNews.create({
-            entityId: entity.id,
-            newId: news.id
-          });
-        }
-      })
-      .then(
-        await News.update(
-          { entitiesCalculated: true },
-          {
-            where: {
-              id: news.id
-            }
+        if (entities != null) {
+          for (let i = 0; i < entities.length; i++) {
+            entities[i].name = news.title.slice(entities[i].start, entities[i].end);
+            const [entity] = await Entities.findOrCreate({
+              where: {
+                name: entities[i].name,
+                type: entities[i].label,
+                field: 'TITLE',
+                program: 'NERD_API'
+              }
+            });
+            await EntitiesNews.create({
+              entityId: entity.id,
+              newId: news.id
+            });
           }
-        )
-      );
+        }
+        return entities;
+      })
+      .then(async response => {
+        if (response != null) {
+          await News.update(
+              { entitiesCalculated: true },
+              {
+                where: {
+                  id: news.id
+                }
+              }
+          )
+        }
+      });
   } catch (error) {
     // Error 😨
     if (error.response) {
