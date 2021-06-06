@@ -120,6 +120,8 @@ const extractEntities = async news => {
             }
           });
           return response;
+        } else {
+          throw new Error('Login failed');
         }
       })
       .then(async response => {
@@ -140,18 +142,20 @@ const extractEntities = async news => {
               newId: news.id
             });
           }
+          return entities;
+        } else {
+          throw new Error('Nerd API is not returning any valid entity');
         }
-        return entities;
       })
       .then(async response => {
         if (response != null) {
           await News.update(
-              { entitiesCalculated: true },
-              {
-                where: {
-                  id: news.id
-                }
+            { entitiesCalculated: true },
+            {
+              where: {
+              id: news.id
               }
+            }
           )
         }
       });
