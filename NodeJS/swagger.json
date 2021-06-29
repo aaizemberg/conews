@@ -27,21 +27,6 @@
      }
    ],
    "paths": {
-      "/medios": {
-         "get": {
-           "operationId": "medios",
-           "description": "Devuelve los medios que se encuentran registrados en la base de datos para ser consultados.",
-           "parameters": [],
-           "responses": {
-             "200": {
-               "description": ""
-             }
-           },
-           "tags": [
-             "Medios"
-           ]
-         }
-      },
       "/cantidad-de-noticias": {
          "get": {
            "operationId": "cantidadDeNoticias",
@@ -479,6 +464,85 @@
               "name": "word",
               "in": "query",
               "description": "Word to add to stopwords",
+              "type": "string"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Administrador"
+          ]
+        },
+        "parameters": []
+      },
+      "/insert-medio": {
+        "post": {
+          "operationId": "insertMedio",
+          "description": "Insert Source",
+          "parameters": [
+            {
+              "name": "authorization",
+              "in": "header",
+              "description": "Authorization token",
+              "type": "string"
+            },
+            {
+              "name": "name",
+              "in": "query",
+              "description": "Source name to add",
+              "type": "string"
+            },
+            {
+              "name": "url",
+              "in": "query",
+              "description": "URL to add",
+              "type": "string"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Administrador"
+          ]
+        },
+        "parameters": []
+      },
+      "/medios": {
+        "get": {
+          "operationId": "medios",
+          "description": "Devuelve los medios que se encuentran registrados en la base de datos para ser consultados.",
+          "parameters": [],
+          "responses": {
+            "200": {
+              "description": ""
+            }
+          },
+          "tags": [
+            "Administrador"
+          ]
+        }
+     },
+      "/medio": {
+        "delete": {
+          "operationId": "deleteMedio",
+          "description": "Delete Source",
+          "parameters": [
+            {
+              "name": "authorization",
+              "in": "header",
+              "description": "Authorization token",
+              "type": "string"
+            },
+            {
+              "name": "name",
+              "in": "query",
+              "description": "Source to delete",
               "type": "string"
             }
           ],

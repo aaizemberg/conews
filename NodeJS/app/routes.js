@@ -8,8 +8,10 @@ const { getSources } = require('./controllers/sources'),
     wordcloud,
     trends,
     insertStopword,
+    insertSource,
     getStopwords,
     deleteStopword,
+    deleteSource,
     getEntities
   } = require('./controllers/news'),
   { login, addUser } = require('./controllers/user'),
@@ -22,7 +24,6 @@ exports.init = app => {
   app.get('/', (req, res) => res.send(DESCRIPTOR));
   // app.post('/insert-sources', [checkIfUserIsLogged], insertSources);
   // app.get('/periodic-news', getPeriodicNews);
-  app.get(`${API_BASE_URL}/medios`, getSources);
   // Resuelto: Agregar roles de usuarios admins para que puedan acceder a los post, y que puedan crear nuevos usuarios admin.
   // Resuelto: En noticias agregar columna booleana para saber si ya se calcularon las entidades, es una marquita que despues cambia oliver
   // TODO: Subir el proyecto a la maquina del ITBA para ir viendo como funciona
@@ -36,6 +37,9 @@ exports.init = app => {
   app.post(`${API_BASE_URL}/insert-stopword`, [checkIfUserIsLogged], insertStopword);
   app.get(`${API_BASE_URL}/stopwords`, [checkIfUserIsLogged], getStopwords);
   app.delete(`${API_BASE_URL}/stopword`, [checkIfUserIsLogged], deleteStopword);
+  app.post(`${API_BASE_URL}/insert-medio`, [checkIfUserIsLogged], insertSource);
+  app.get(`${API_BASE_URL}/medios`, getSources);
+  app.delete(`${API_BASE_URL}/medio`, [checkIfUserIsLogged], deleteSource);
   app.post(`${API_BASE_URL}/login`, [validateSchema(schemas.userSignIn)], login);
   app.post(`${API_BASE_URL}/user`, [validateSchema(schemas.userSignUp)], addUser);
   app.get(`${API_BASE_URL}/entidades`, getEntities);

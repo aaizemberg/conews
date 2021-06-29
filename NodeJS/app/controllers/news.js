@@ -472,6 +472,14 @@ exports.insertStopword = async (req, res) => {
   return res.send('Ok, inserted stopword');
 };
 
+exports.insertSource = async (req, res) => {
+  await Sources.create({
+    name: req.query.name,
+    url: req.query.url
+  }).catch(error => logger.info(error));
+  return res.send('Ok, inserted source');
+};
+
 exports.getStopwords = async (req, res) => {
   const response = await Stopwords.findAll().catch(error => logger.info(error));
   return res.send(response);
@@ -492,4 +500,21 @@ exports.deleteStopword = async (req, res) => {
     }
   }).catch(error => logger.info(error));
   return res.send('Ok, deleted stopword');
+};
+
+exports.deleteSource = async (req, res) => {
+  const source = await Sources.findOne({
+    where: {
+      name: req.query.name
+    }
+  }).catch(error => logger.info(error));
+  if (!source) {
+    return res.status(400).send('Cannot find source');
+  }
+  await Sources.destroy({
+    where: {
+      name: req.query.name
+    }
+  }).catch(error => logger.info(error));
+  return res.send('Ok, deleted source');
 };
