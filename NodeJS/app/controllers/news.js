@@ -40,7 +40,6 @@ const getPeriodicNewsJob = () => {
                   title: itemTitle,
                   url: link,
                   publicationDate: getDate(new Date(pubDate)),
-                  content: itemTitle,
                   sourceId: sources[i].id
                 }
               });
