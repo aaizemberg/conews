@@ -84,6 +84,11 @@ exports.SOURCES = [
     id: 16,
     name: 'Cronica',
     url: 'https://www.cronica.com.ar'
+  },
+  {
+    id: 17,
+    name: 'El diario AR',
+    url: 'https://www.eldiarioar.com'
   }
 ];
 
