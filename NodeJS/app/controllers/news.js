@@ -8,7 +8,7 @@ const { getNews } = require('../services/googleNews'),
   logger = require('../logger'),
   schedule = require('node-schedule'),
   { News, Sources, Stopwords, Entities, EntitiesNews } = require('../models'),
-  { getDate, success, getCurrentDate } = require('./utils'),
+  { success, getCurrentDate } = require('./utils'),
   { DEFAULT_ARRAY, DEFAULT_TYPES_ENTITIES } = require('./constants'),
   db = require('../models');
 
@@ -39,7 +39,7 @@ const getPeriodicNewsJob = () => {
                 defaults: {
                   title: itemTitle,
                   url: link,
-                  publicationDate: getDate(new Date(pubDate)),
+                  publicationDate: new Date(pubDate),
                   sourceId: sources[i].id
                 }
               });

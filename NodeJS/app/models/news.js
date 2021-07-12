@@ -19,7 +19,7 @@ module.exports = (sequelize, Sequelize) => {
       },
       entitiesCalculated: { type: Sequelize.BOOLEAN, defaultValue: false },
       publicationDate: {
-        type: Sequelize.DATEONLY,
+        type: Sequelize.DATE,
         allowNull: true
       },
       sourceId: {
