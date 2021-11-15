@@ -226,7 +226,8 @@ exports.getNewsQuantitySQL = async (req, res) => {
       SELECT date("News"."publicationDate") AS "date", COUNT("News"."id") AS cantidad \
       FROM "News" INNER JOIN "Sources" ON "News"."sourceId"="Sources"."id" \
       WHERE "News"."publicationDate" IS NOT NULL AND date("News"."publicationDate") >= (:d_from) \
-      AND date("News"."publicationDate") <= (:d_to) AND LOWER("News"."title") LIKE (:words) AND "Sources"."id" IN (:sources)\
+        AND date("News"."publicationDate") <= (:d_to) AND LOWER("News"."title") LIKE (:words) \
+        AND "Sources"."id" IN (:sources) \
       GROUP BY date("News"."publicationDate") \
       ORDER BY date("News"."publicationDate") DESC',
       {
