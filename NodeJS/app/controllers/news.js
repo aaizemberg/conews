@@ -65,9 +65,11 @@ exports.getEntities = async (req, res) => {
     FROM "Entities" INNER JOIN "EntitiesNews" ON "Entities"."id"="EntitiesNews"."entityId"\
     INNER JOIN "News" ON "EntitiesNews"."newId"="News"."id" \
     INNER JOIN "Sources" ON "News"."sourceId"="Sources"."id" \
-    WHERE "News"."publicationDate" IS NOT NULL AND "News"."publicationDate" >= (:d_from) \
-    AND "News"."publicationDate" <= (:d_to) AND "Entities"."type" IN (:types)\
-    AND "Sources"."id" IN (:sources)\
+    WHERE "News"."publicationDate" IS NOT NULL \
+      AND date("News"."publicationDate") >= (:d_from) \
+      AND date("News"."publicationDate") <= (:d_to) \
+      AND "Entities"."type" IN (:types) \
+      AND "Sources"."id" IN (:sources) \
     GROUP BY "Entities"."id"\
     ORDER BY quantity DESC',
       {
@@ -251,12 +253,16 @@ exports.heatmapSQL = async (req, res) => {
   const news = await db.sequelize
     .query(
       '\
-      SELECT "News"."publicationDate" AS "date", "Sources"."name" AS "source_name", COUNT("News"."id") AS "news_count" \
+      SELECT date("News"."publicationDate") AS "date", "Sources"."name" AS "source_name", \
+             COUNT("News"."id") AS "news_count" \
       FROM "News" INNER JOIN "Sources" ON "News"."sourceId"="Sources"."id" \
-      WHERE "News"."publicationDate" IS NOT NULL AND "News"."publicationDate" >= (:d_from) \
-      AND "News"."publicationDate" <= (:d_to) AND LOWER("News"."title") LIKE (:words) AND "Sources"."id" IN (:sources)\
-      GROUP BY "News"."publicationDate", "Sources"."name"\
-      ORDER BY "News"."publicationDate" DESC',
+      WHERE "News"."publicationDate" IS NOT NULL \
+        AND date("News"."publicationDate") >= (:d_from) \
+        AND date("News"."publicationDate") <= (:d_to) \
+        AND LOWER("News"."title") LIKE (:words) \
+        AND "Sources"."id" IN (:sources)\
+      GROUP BY date("News"."publicationDate"), "Sources"."name"\
+      ORDER BY date("News"."publicationDate") DESC',
       {
         replacements: {
           d_from: d_from ? d_from : getCurrentDate(),
