@@ -347,8 +347,11 @@ exports.wordcloud = async (req, res) => {
       '\
     SELECT "News"."title" \
     FROM "News" INNER JOIN "Sources" ON "News"."sourceId"="Sources"."id" \
-    WHERE "News"."publicationDate" IS NOT NULL AND "News"."publicationDate" >= (:d_from) \
-    AND "News"."publicationDate" <= (:d_to) AND LOWER("News"."title") LIKE (:words) AND "Sources"."id" IN (:sources)\
+    WHERE "News"."publicationDate" IS NOT NULL \
+      AND date("News"."publicationDate") >= (:d_from) \
+      AND date("News"."publicationDate") <= (:d_to) \
+      AND LOWER("News"."title") LIKE (:words) \
+      AND "Sources"."id" IN (:sources) \
     ORDER BY "News"."id" ASC',
       {
         replacements: {
