@@ -223,12 +223,12 @@ exports.getNewsQuantitySQL = async (req, res) => {
   const news = await db.sequelize
     .query(
       '\
-      SELECT "News"."publicationDate" AS "date", COUNT("News"."id") AS cantidad \
+      SELECT date("News"."publicationDate") AS "date", COUNT("News"."id") AS cantidad \
       FROM "News" INNER JOIN "Sources" ON "News"."sourceId"="Sources"."id" \
-      WHERE "News"."publicationDate" IS NOT NULL AND "News"."publicationDate" >= (:d_from) \
-      AND "News"."publicationDate" <= (:d_to) AND LOWER("News"."title") LIKE (:words) AND "Sources"."id" IN (:sources)\
-      GROUP BY "News"."publicationDate"\
-      ORDER BY "News"."publicationDate" DESC',
+      WHERE "News"."publicationDate" IS NOT NULL AND date("News"."publicationDate") >= (:d_from) \
+      AND date("News"."publicationDate") <= (:d_to) AND LOWER("News"."title") LIKE (:words) AND "Sources"."id" IN (:sources)\
+      GROUP BY date("News"."publicationDate") \
+      ORDER BY date("News"."publicationDate") DESC',
       {
         replacements: {
           d_from: d_from ? d_from : getCurrentDate(),
