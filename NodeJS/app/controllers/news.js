@@ -422,9 +422,9 @@ exports.trends = async (req, res) => {
     FROM "News" INNER JOIN "Sources" ON "News"."sourceId"="Sources"."id" \
     WHERE "News"."publicationDate" IS NOT NULL \
       AND date("News"."publicationDate") >= (:d_from) \
-      AND date("News"."publicationDate") <= (:d_to) \ 
+      AND date("News"."publicationDate") <= (:d_to) \
       AND "Sources"."id" IN (:sources) \
-    ORDER BY "News"."publicationDate" ASC',
+    ORDER BY "News"."publicationDate" ',
       {
         replacements: {
           d_from: d_from ? d_from : getCurrentDate(),
