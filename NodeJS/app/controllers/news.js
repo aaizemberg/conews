@@ -286,8 +286,11 @@ exports.searchSQL = async (req, res) => {
       '\
     SELECT "News"."url", "Sources"."name" AS "source", "News"."title", "News"."publicationDate" \
     FROM "News" INNER JOIN "Sources" ON "News"."sourceId"="Sources"."id" \
-    WHERE "News"."publicationDate" IS NOT NULL AND "News"."publicationDate" >= (:d_from) \
-    AND "News"."publicationDate" <= (:d_to) AND LOWER("News"."title") LIKE (:words) AND "Sources"."id" IN (:sources)\
+    WHERE "News"."publicationDate" IS NOT NULL \
+      AND date("News"."publicationDate") >= (:d_from) \
+      AND date("News"."publicationDate") <= (:d_to) \
+      AND LOWER("News"."title") LIKE (:words) \
+      AND "Sources"."id" IN (:sources) \
     ORDER BY "News"."id" ASC\
     OFFSET (:offset) ROWS\
     FETCH NEXT (:limit) ROWS ONLY',
@@ -316,8 +319,11 @@ exports.wordtree = async (req, res) => {
       '\
     SELECT "News"."title" \
     FROM "News" INNER JOIN "Sources" ON "News"."sourceId"="Sources"."id" \
-    WHERE "News"."publicationDate" IS NOT NULL AND "News"."publicationDate" >= (:d_from) \
-    AND "News"."publicationDate" <= (:d_to) AND LOWER("News"."title") LIKE (:words) AND "Sources"."id" IN (:sources)\
+    WHERE "News"."publicationDate" IS NOT NULL \
+      AND date("News"."publicationDate") >= (:d_from) \
+      AND date("News"."publicationDate") <= (:d_to) \
+      AND LOWER("News"."title") LIKE (:words) \
+      AND "Sources"."id" IN (:sources)\
     ORDER BY "News"."id" ASC\
     OFFSET (:offset) ROWS\
     FETCH NEXT (:limit) ROWS ONLY',
@@ -414,8 +420,10 @@ exports.trends = async (req, res) => {
       '\
     SELECT "News"."title", "News"."publicationDate" AS "publication_date" \
     FROM "News" INNER JOIN "Sources" ON "News"."sourceId"="Sources"."id" \
-    WHERE "News"."publicationDate" IS NOT NULL AND "News"."publicationDate" >= (:d_from) \
-    AND "News"."publicationDate" <= (:d_to) AND "Sources"."id" IN (:sources)\
+    WHERE "News"."publicationDate" IS NOT NULL \
+      AND date("News"."publicationDate") >= (:d_from) \
+      AND date("News"."publicationDate") <= (:d_to) \ 
+      AND "Sources"."id" IN (:sources) \
     ORDER BY "News"."publicationDate" ASC',
       {
         replacements: {
