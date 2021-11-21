@@ -140,9 +140,11 @@ const extractEntities = async news => {
                 program: 'NERD_API'
               }
             });
-            await EntitiesNews.create({
-              entityId: entity.id,
-              newId: news.id
+            await EntitiesNews.findOrCreate({
+              where: {
+                entityId: entity.id,
+                newId: news.id
+              }
             });
           }
           return entities;
