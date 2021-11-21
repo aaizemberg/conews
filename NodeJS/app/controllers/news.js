@@ -93,7 +93,7 @@ const extractEntities = async news => {
 
   try {
     await axios({
-      url: 'http://nerd.it.itba.edu.ar:80/api/auth/token',
+      url: 'https://nerd.it.itba.edu.ar/api/auth/token',
       method: 'post',
       headers: {
         accept: 'application/json',
@@ -111,7 +111,7 @@ const extractEntities = async news => {
           throw new Error('Login failed');
         } else {
           const response = await axios({
-            url: 'http://nerd.it.itba.edu.ar:80/api/ner/current/entities',
+            url: 'https://nerd.it.itba.edu.ar/api/ner/current/entities',
             method: 'post',
             headers: {
               accept: 'application/json',
@@ -190,7 +190,6 @@ const extractAllEntities = () => {
   return News.findAll({
     where: {
       entitiesCalculated: false,
-      publicationDate: getCurrentDate()
     }
   })
     .then(async news => {
