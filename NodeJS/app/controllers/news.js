@@ -189,7 +189,7 @@ const extractAllEntities = () => {
   logger.info('Extracting all entities...');
   return News.findAll({
     where: {
-      entitiesCalculated: false,
+      entitiesCalculated: false
     }
   })
     .then(async news => {
