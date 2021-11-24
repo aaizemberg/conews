@@ -419,7 +419,7 @@ exports.trends = async (req, res) => {
   const news = await db.sequelize
     .query(
       '\
-    SELECT "News"."title", "News"."publicationDate" AS "publication_date" \
+    SELECT "News"."title", date("News"."publicationDate") AS "publication_date" \
     FROM "News" INNER JOIN "Sources" ON "News"."sourceId"="Sources"."id" \
     WHERE "News"."publicationDate" IS NOT NULL \
       AND date("News"."publicationDate") >= (:d_from) \
