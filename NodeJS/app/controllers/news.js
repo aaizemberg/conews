@@ -107,7 +107,7 @@ const extractEntities = async news => {
     })
       .then(async resultNerd => {
         const { access_token } = resultNerd.data;
-        if (access_token === null && access_token === undefined) {
+        if (access_token === null || access_token === undefined) {
           throw new Error('Login failed');
         } else {
           const response = await axios({
@@ -127,7 +127,7 @@ const extractEntities = async news => {
       })
       .then(async response => {
         const { entities } = response.data;
-        if (entities === null && entities === undefined) {
+        if (entities === null || entities === undefined) {
           throw new Error('Nerd API is not returning any valid entity');
         } else {
           for (let i = 0; i < entities.length; i++) {
@@ -284,9 +284,8 @@ exports.searchSQL = async (req, res) => {
   const { d_from, d_to, words, sources, page, limit, entities, entitiesTypes } = req.query;
   const sources_arr = sources ? sources.split(',') : DEFAULT_ARRAY;
   const types_arr = entitiesTypes ? entitiesTypes.split(',') : DEFAULT_TYPES_ENTITIES;
-  const entitiesFlag = entities ? entities : 0;
 
-  if (entitiesFlag === 0) {
+  if (entities === null || entities === undefined || entities === 0) {
     const news1 = await db.sequelize
       .query(
         '\
