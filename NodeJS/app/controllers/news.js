@@ -329,7 +329,7 @@ exports.searchSQL = async (req, res) => {
         AND LOWER("News"."title") LIKE (:words) \
         AND "Entities"."type" IN (:types) \
         AND "Sources"."id" IN (:sources) \
-      GROUP BY 2,3,4,5\
+      GROUP BY "Sources"."id", "News"."id"\
       ORDER BY "News"."id" ASC\
       OFFSET (:offset) ROWS\
       FETCH NEXT (:limit) ROWS ONLY',
