@@ -330,6 +330,7 @@ exports.searchSQL = async (req, res) => {
         AND "Entities"."type" IN (:types) \
         AND "Sources"."id" IN (:sources) \
       ORDER BY "News"."id" ASC\
+      GROUP BY "News"."id"\
       OFFSET (:offset) ROWS\
       FETCH NEXT (:limit) ROWS ONLY',
       {
