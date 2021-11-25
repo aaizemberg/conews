@@ -278,6 +278,7 @@ exports.heatmapSQL = async (req, res) => {
   return res.send(success(news));
 };
 
+// eslint-disable-next-line complexity
 exports.searchSQL = async (req, res) => {
   logger.info('Search...');
   const { d_from, d_to, words, sources, page, limit, entities, entitiesTypes } = req.query;
