@@ -298,7 +298,7 @@ exports.searchSQL = async (req, res) => {
         AND "Sources"."id" IN (:sources) \\\
       ORDER BY "News"."id" ASC\\\
       OFFSET (:offset) ROWS\\\
-      FETCH NEXT (:limit) ROWS ONLY\',
+      FETCH NEXT (:limit) ROWS ONLY',
         {
           replacements: {
             d_from: d_from ? d_from : getCurrentDate(),
