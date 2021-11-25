@@ -289,21 +289,16 @@ exports.searchSQL = async (req, res) => {
     const news1 = await db.sequelize
       .query(
         '\
-        SELECT "Entities"."name", "News"."url", "Sources"."name" AS "source"\
-        , "News"."title", "News"."publicationDate" \
-        FROM "News" INNER JOIN "Sources" ON "News"."sourceId"="Sources"."id" \
-        INNER JOIN "EntitiesNews" ON "Entities"."id"="EntitiesNews"."entityId"\
-        INNER JOIN "News" ON "EntitiesNews"."newId"="News"."id"\
-        WHERE "News"."publicationDate" IS NOT NULL \
-          AND date("News"."publicationDate") >= (:d_from) \
-          AND date("News"."publicationDate") <= (:d_to) \
-          AND LOWER("News"."title") LIKE (:words) \
-          AND "Entities"."type" IN (:types) \
-          AND "Sources"."id" IN (:sources) \
-        ORDER BY "News"."id" ASC\
-        GROUP BY "News"."id"\
-        OFFSET (:offset) ROWS\
-        FETCH NEXT (:limit) ROWS ONLY',
+      SELECT "News"."url", "Sources"."name" AS "source", "News"."title", "News"."publicationDate" \\\
+      FROM "News" INNER JOIN "Sources" ON "News"."sourceId"="Sources"."id" \\\
+      WHERE "News"."publicationDate" IS NOT NULL \\\
+        AND date("News"."publicationDate") >= (:d_from) \\\
+        AND date("News"."publicationDate") <= (:d_to) \\\
+        AND LOWER("News"."title") LIKE (:words) \\\
+        AND "Sources"."id" IN (:sources) \\\
+      ORDER BY "News"."id" ASC\\\
+      OFFSET (:offset) ROWS\\\
+      FETCH NEXT (:limit) ROWS ONLY\',
         {
           replacements: {
             d_from: d_from ? d_from : getCurrentDate(),
@@ -323,14 +318,19 @@ exports.searchSQL = async (req, res) => {
   const news2 = await db.sequelize
     .query(
       '\
-      SELECT "News"."url", "Sources"."name" AS "source", "News"."title", "News"."publicationDate" \
+      SELECT "Entities"."name", "News"."url", "Sources"."name" AS "source"\
+      , "News"."title", "News"."publicationDate" \
       FROM "News" INNER JOIN "Sources" ON "News"."sourceId"="Sources"."id" \
+      INNER JOIN "EntitiesNews" ON "Entities"."id"="EntitiesNews"."entityId"\
+      INNER JOIN "News" ON "EntitiesNews"."newId"="News"."id"\
       WHERE "News"."publicationDate" IS NOT NULL \
         AND date("News"."publicationDate") >= (:d_from) \
         AND date("News"."publicationDate") <= (:d_to) \
         AND LOWER("News"."title") LIKE (:words) \
+        AND "Entities"."type" IN (:types) \
         AND "Sources"."id" IN (:sources) \
       ORDER BY "News"."id" ASC\
+      GROUP BY "News"."id"\
       OFFSET (:offset) ROWS\
       FETCH NEXT (:limit) ROWS ONLY',
       {
