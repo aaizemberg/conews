@@ -321,8 +321,8 @@ exports.searchSQL = async (req, res) => {
       SELECT string_agg("Entities"."name", \', \') AS entities_list, "News"."url"\
       , "Sources"."name" AS "source", "News"."title", "News"."publicationDate" \
       FROM "News" INNER JOIN "Sources" ON "News"."sourceId"="Sources"."id" \
-      INNER JOIN "EntitiesNews" ON "Entities"."id"="EntitiesNews"."entityId"\
-      INNER JOIN "News" ON "EntitiesNews"."newId"="News"."id"\
+      INNER JOIN "EntitiesNews" ON "News"."id"="EntitiesNews"."newId"\
+      INNER JOIN "Entities" ON "EntitiesNews"."entityId"="Entities"."id"\
       WHERE "News"."publicationDate" IS NOT NULL \
         AND date("News"."publicationDate") >= (:d_from) \
         AND date("News"."publicationDate") <= (:d_to) \
