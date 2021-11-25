@@ -118,7 +118,7 @@
        "/busqueda": {
          "get": {
            "operationId": "busqueda",
-           "description": "Devuelve las noticias en la base de datos. Si no se especifica rango de fechas, devuelve las noticias del día.",
+           "description": "Devuelve las noticias en la base de datos. Si no se especifica rango de fechas, devuelve las noticias del día. Con entities = 1 trae las entidades relacionadas.",
            "parameters": [
              {
                "name": "d_from",
@@ -146,6 +146,18 @@
                "name": "sources",
                "in": "query",
                "description": "Buscar noticias de los medios con estos IDs, separados por coma",
+               "type": "string"
+             },
+             {
+               "name": "entities",
+               "in": "query",
+               "description": "Cuando es 0 no hace búsqueda de entidades, cuando es distinto a cero trae entidades.",
+               "type": "integer"
+             },
+             {
+               "name": "entitiesTypes",
+               "in": "query",
+               "description": "Buscar entidades de un tipo en especial, separados por coma [\"MISC\", \"PER\", \"LOC\", \"ORG\"]",
                "type": "string"
              },
              {
