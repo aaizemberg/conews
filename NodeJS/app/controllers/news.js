@@ -318,8 +318,8 @@ exports.searchSQL = async (req, res) => {
   const news2 = await db.sequelize
     .query(
       '\
-      SELECT "Entities"."name", "News"."url", "Sources"."name" AS "source"\
-      , "News"."title", "News"."publicationDate" \
+      SELECT string_agg("Entities"."name", \', \') AS entities_list, "News"."url"\
+      , "Sources"."name" AS "source", "News"."title", "News"."publicationDate" \
       FROM "News" INNER JOIN "Sources" ON "News"."sourceId"="Sources"."id" \
       INNER JOIN "EntitiesNews" ON "Entities"."id"="EntitiesNews"."entityId"\
       INNER JOIN "News" ON "EntitiesNews"."newId"="News"."id"\
