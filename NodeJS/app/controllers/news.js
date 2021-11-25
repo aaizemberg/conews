@@ -289,15 +289,15 @@ exports.searchSQL = async (req, res) => {
     const news1 = await db.sequelize
       .query(
         '\
-      SELECT "News"."url", "Sources"."name" AS "source", "News"."title", "News"."publicationDate" \\\
-      FROM "News" INNER JOIN "Sources" ON "News"."sourceId"="Sources"."id" \\\
-      WHERE "News"."publicationDate" IS NOT NULL \\\
-        AND date("News"."publicationDate") >= (:d_from) \\\
-        AND date("News"."publicationDate") <= (:d_to) \\\
-        AND LOWER("News"."title") LIKE (:words) \\\
-        AND "Sources"."id" IN (:sources) \\\
-      ORDER BY "News"."id" ASC\\\
-      OFFSET (:offset) ROWS\\\
+      SELECT "News"."url", "Sources"."name" AS "source", "News"."title", "News"."publicationDate" \
+      FROM "News" INNER JOIN "Sources" ON "News"."sourceId"="Sources"."id" \
+      WHERE "News"."publicationDate" IS NOT NULL \
+        AND date("News"."publicationDate") >= (:d_from) \
+        AND date("News"."publicationDate") <= (:d_to) \
+        AND LOWER("News"."title") LIKE (:words) \
+        AND "Sources"."id" IN (:sources) \
+      ORDER BY "News"."id" ASC\
+      OFFSET (:offset) ROWS\
       FETCH NEXT (:limit) ROWS ONLY',
         {
           replacements: {
@@ -339,7 +339,7 @@ exports.searchSQL = async (req, res) => {
           d_to: d_to ? d_to : getCurrentDate(),
           words: words ? `%${words.toLowerCase()}%` : '%',
           sources: sources_arr,
-          entitiesTypes: types_arr,
+          types: types_arr,
           offset: (page - 1) * limit,
           limit
         },
