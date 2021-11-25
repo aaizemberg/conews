@@ -285,38 +285,38 @@ exports.searchSQL = async (req, res) => {
   const types_arr = entitiesTypes ? entitiesTypes.split(',') : DEFAULT_TYPES_ENTITIES;
   const entitiesFlag = entities ? entities : 0;
 
-  if (entitiesFlag == 0) {
-  const news1 = await db.sequelize
-    .query(
-      '\
-      SELECT "Entities"."name", "News"."url", "Sources"."name" AS "source"\
-      , "News"."title", "News"."publicationDate" \
-      FROM "News" INNER JOIN "Sources" ON "News"."sourceId"="Sources"."id" \
-      INNER JOIN "EntitiesNews" ON "Entities"."id"="EntitiesNews"."entityId"\
-      INNER JOIN "News" ON "EntitiesNews"."newId"="News"."id"\
-      WHERE "News"."publicationDate" IS NOT NULL \
-        AND date("News"."publicationDate") >= (:d_from) \
-        AND date("News"."publicationDate") <= (:d_to) \
-        AND LOWER("News"."title") LIKE (:words) \
-        AND "Entities"."type" IN (:types) \
-        AND "Sources"."id" IN (:sources) \
-      ORDER BY "News"."id" ASC\
-      GROUP BY "News"."id"\
-      OFFSET (:offset) ROWS\
-      FETCH NEXT (:limit) ROWS ONLY',
-      {
-        replacements: {
-          d_from: d_from ? d_from : getCurrentDate(),
-          d_to: d_to ? d_to : getCurrentDate(),
-          words: words ? `%${words.toLowerCase()}%` : '%',
-          sources: sources_arr,
-          offset: (page - 1) * limit,
-          limit
-        },
-        type: db.sequelize.QueryTypes.SELECT
-      }
-    )
-    .catch(error => logger.info(error));
+  if (entitiesFlag === 0) {
+    const news1 = await db.sequelize
+      .query(
+        '\
+        SELECT "Entities"."name", "News"."url", "Sources"."name" AS "source"\
+        , "News"."title", "News"."publicationDate" \
+        FROM "News" INNER JOIN "Sources" ON "News"."sourceId"="Sources"."id" \
+        INNER JOIN "EntitiesNews" ON "Entities"."id"="EntitiesNews"."entityId"\
+        INNER JOIN "News" ON "EntitiesNews"."newId"="News"."id"\
+        WHERE "News"."publicationDate" IS NOT NULL \
+          AND date("News"."publicationDate") >= (:d_from) \
+          AND date("News"."publicationDate") <= (:d_to) \
+          AND LOWER("News"."title") LIKE (:words) \
+          AND "Entities"."type" IN (:types) \
+          AND "Sources"."id" IN (:sources) \
+        ORDER BY "News"."id" ASC\
+        GROUP BY "News"."id"\
+        OFFSET (:offset) ROWS\
+        FETCH NEXT (:limit) ROWS ONLY',
+        {
+          replacements: {
+            d_from: d_from ? d_from : getCurrentDate(),
+            d_to: d_to ? d_to : getCurrentDate(),
+            words: words ? `%${words.toLowerCase()}%` : '%',
+            sources: sources_arr,
+            offset: (page - 1) * limit,
+            limit
+          },
+          type: db.sequelize.QueryTypes.SELECT
+        }
+      )
+      .catch(error => logger.info(error));
     return res.send(success(news1));
   }
 
