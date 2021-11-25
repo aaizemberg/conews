@@ -284,10 +284,9 @@ exports.searchSQL = async (req, res) => {
   const sources_arr = sources ? sources.split(',') : DEFAULT_ARRAY;
   const types_arr = entitiesTypes ? entitiesTypes.split(',') : DEFAULT_TYPES_ENTITIES;
   const entitiesFlag = entities ? entities : 0;
-  let news;
 
   if (entitiesFlag == 0) {
-  news = await db.sequelize
+  const news1 = await db.sequelize
     .query(
       '\
       SELECT "Entities"."name", "News"."url", "Sources"."name" AS "source"\
@@ -318,8 +317,10 @@ exports.searchSQL = async (req, res) => {
       }
     )
     .catch(error => logger.info(error));
-  } else {
-  news = await db.sequelize
+    return res.send(success(news1));
+  }
+
+  const news2 = await db.sequelize
     .query(
       '\
       SELECT "News"."url", "Sources"."name" AS "source", "News"."title", "News"."publicationDate" \
@@ -346,9 +347,8 @@ exports.searchSQL = async (req, res) => {
       }
     )
     .catch(error => logger.info(error));
-  }
 
-  return res.send(success(news));
+  return res.send(success(news2));
 };
 
 exports.wordtree = async (req, res) => {
