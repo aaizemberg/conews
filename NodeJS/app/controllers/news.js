@@ -290,8 +290,8 @@ exports.searchSQL = async (req, res) => {
   const types_arr = entitiesTypes ? entitiesTypes.split(',') : DEFAULT_TYPES_ENTITIES;
   const words_sanitized = words
     .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '');
+    .normalize('NFKD')
+    .replace(/[^\w]/g, '');
 
   if (entities === null || entities === undefined || entities === 0) {
     const news1 = await db.sequelize
