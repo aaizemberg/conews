@@ -308,7 +308,7 @@ exports.searchSQL = async (req, res) => {
             d_from: d_from ? d_from : getCurrentDate(),
             d_to: d_to ? d_to : getCurrentDate(),
             words: words ? `%${words.toLowerCase()}%` : '%',
-            words_sanitized: words ? `%${words.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")}%` : '%',
+            words_sanitized: words ? `%${words.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')}%` : '%',
             sources: sources_arr,
             offset: (page - 1) * limit,
             limit
