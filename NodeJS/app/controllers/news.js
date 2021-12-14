@@ -298,7 +298,7 @@ exports.searchSQL = async (req, res) => {
       WHERE "News"."publicationDate" IS NOT NULL \
         AND date("News"."publicationDate") >= (:d_from) \
         AND date("News"."publicationDate") <= (:d_to) \
-        AND LOWER("News"."title") LIKE (:words) \
+        AND (LOWER("News"."title") LIKE (:words) OR  LOWER("News"."title") LIKE (:words_sanitized))\
         AND "Sources"."id" IN (:sources) \
       ORDER BY "News"."id" ASC\
       OFFSET (:offset) ROWS\
@@ -308,6 +308,7 @@ exports.searchSQL = async (req, res) => {
             d_from: d_from ? d_from : getCurrentDate(),
             d_to: d_to ? d_to : getCurrentDate(),
             words: words ? `%${words.toLowerCase()}%` : '%',
+            words_sanitized: words ? `%${words.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")}%` : '%',
             sources: sources_arr,
             offset: (page - 1) * limit,
             limit
