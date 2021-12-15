@@ -288,10 +288,6 @@ exports.searchSQL = async (req, res) => {
   const { d_from, d_to, words, sources, page, limit, entities, entitiesTypes } = req.query;
   const sources_arr = sources ? sources.split(',') : DEFAULT_ARRAY;
   const types_arr = entitiesTypes ? entitiesTypes.split(',') : DEFAULT_TYPES_ENTITIES;
-  const words_sanitized = words
-    .toLowerCase()
-    .normalize('NFKD')
-    .replace(/[^\w]/g, '');
 
   if (entities === null || entities === undefined || entities === 0) {
     const news1 = await db.sequelize
@@ -302,7 +298,7 @@ exports.searchSQL = async (req, res) => {
       WHERE "News"."publicationDate" IS NOT NULL \
         AND date("News"."publicationDate") >= (:d_from) \
         AND date("News"."publicationDate") <= (:d_to) \
-        AND (LOWER("News"."title") LIKE (:words) OR  LOWER("News"."title") LIKE (:words_sanitized))\
+        AND unaccent("News"."title") ILIKE unaccent(:words)\
         AND "Sources"."id" IN (:sources) \
       ORDER BY "News"."id" ASC\
       OFFSET (:offset) ROWS\
@@ -311,8 +307,7 @@ exports.searchSQL = async (req, res) => {
           replacements: {
             d_from: d_from ? d_from : getCurrentDate(),
             d_to: d_to ? d_to : getCurrentDate(),
-            words: words ? `%${words.toLowerCase()}%` : '%',
-            words_sanitized: words ? `%${words_sanitized}%` : '%',
+            words: words ? `%${words}%` : '%',
             sources: sources_arr,
             offset: (page - 1) * limit,
             limit
@@ -335,7 +330,7 @@ exports.searchSQL = async (req, res) => {
       WHERE "News"."publicationDate" IS NOT NULL \
         AND date("News"."publicationDate") >= (:d_from) \
         AND date("News"."publicationDate") <= (:d_to) \
-        AND (LOWER("News"."title") LIKE (:words) OR  LOWER("News"."title") LIKE (:words_sanitized))\
+        AND unaccent("News"."title") ILIKE unaccent(:words)\
         AND "Entities"."type" IN (:types) \
         AND "Sources"."id" IN (:sources) \
       GROUP BY "Sources"."id", "News"."id"\
@@ -346,8 +341,7 @@ exports.searchSQL = async (req, res) => {
         replacements: {
           d_from: d_from ? d_from : getCurrentDate(),
           d_to: d_to ? d_to : getCurrentDate(),
-          words: words ? `%${words.toLowerCase()}%` : '%',
-          words_sanitized: words ? `%${words_sanitized}%` : '%',
+          words: words ? `%${words}%` : '%',
           sources: sources_arr,
           types: types_arr,
           offset: (page - 1) * limit,
