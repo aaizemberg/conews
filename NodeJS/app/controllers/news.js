@@ -529,7 +529,7 @@ exports.trends = async (req, res) => {
 
 exports.insertStopword = async (req, res) => {
   await Stopwords.findOrCreate({
-    where: { word: req.query.word }
+    where: { word: req.query.word.toLowerCase() }
   }).catch(error => logger.info(error));
   return res.send('Ok, inserted stopword');
 };
