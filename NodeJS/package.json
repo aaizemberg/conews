@@ -40,7 +40,7 @@
     "url": "https://github.com/aatar/ma-expressV2.git"
   },
   "bugs": {
-    "url": "https://github.com/aatar/ma-expressV2/issues",
+    "url": "https://github.com/aatar/ma-expressV2/issues"
   },
   "jest": {
     "collectCoverageFrom": [
