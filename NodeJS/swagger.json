@@ -475,7 +475,7 @@
             {
               "name": "word",
               "in": "query",
-              "description": "Word to add to stopwords",
+              "description": "Word to delte from stopwords",
               "type": "string"
             }
           ],

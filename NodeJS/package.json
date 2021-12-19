@@ -32,7 +32,7 @@
     "node_modules"
   ],
   "main": "app.js",
-  "author": "Wolox",
+  "author": "ITBA",
   "homepage": "https://github.com/aatar/ma-expressV2",
   "license": "MIT",
   "repository": {
@@ -41,7 +41,6 @@
   },
   "bugs": {
     "url": "https://github.com/aatar/ma-expressV2/issues",
-    "email": "tls@wolox.com.ar"
   },
   "jest": {
     "collectCoverageFrom": [

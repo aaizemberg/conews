@@ -24,11 +24,5 @@ exports.notLoggedError = message => internalError(message, exports.NOT_LOGGED_ER
 exports.SIGNOUT_ERROR = 'signout_error';
 exports.signOutError = message => internalError(message, exports.SIGNOUT_ERROR);
 
-exports.ALREADY_BOUGHT_ALBUM_ERROR = 'already_bought_album_error';
-exports.alreadyBoughtAlbumError = message => internalError(message, exports.ALREADY_BOUGHT_ALBUM_ERROR);
-
-exports.DIDNT_BUY_ALBUM_ERROR = 'didnt_buy_album_error';
-exports.didntBuyAlbumError = message => internalError(message, exports.DIDNT_BUY_ALBUM_ERROR);
-
 exports.NOT_HAS_ACCESS_ERROR = 'not_has_access';
 exports.notHasAccessError = message => internalError(message, exports.NOT_HAS_ACCESS_ERROR);
