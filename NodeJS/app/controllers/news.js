@@ -18,33 +18,35 @@ const getPeriodicNewsJob = () => {
     .then(async sources => {
       for (let i = 0; i < sources.length; i++) {
         try {
-          const response = await getNews([sources[i].rss]);
-          await Sources.update(
-            {
-              lastUpdate: getCurrentDate()
-            },
-            {
-              where: { url: sources[i].url }
-            }
-          );
-          response.items.map(async item => {
-            const { title, link, pubDate } = item;
-            if (link.startsWith(sources[i].url)) {
-              const itemTitle = title.split(' - ')[0];
-              await News.findOrCreate({
-                where: {
-                  url: item.link,
-                  title: item.title.split(' - ')[0]
-                },
-                defaults: {
-                  title: itemTitle,
-                  url: link,
-                  publicationDate: new Date(pubDate),
-                  sourceId: sources[i].id
-                }
-              });
-            }
-          });
+          if (sources[i].rss) {
+            const response = await getNews([sources[i].rss]);
+            await Sources.update(
+              {
+                lastUpdate: getCurrentDate()
+              },
+              {
+                where: { url: sources[i].url }
+              }
+            );
+            response.items.map(async item => {
+              const { title, link, pubDate } = item;
+              if (link.startsWith(sources[i].url)) {
+                const itemTitle = title.split(' - ')[0];
+                await News.findOrCreate({
+                  where: {
+                    url: item.link,
+                    title: item.title.split(' - ')[0]
+                  },
+                  defaults: {
+                    title: itemTitle,
+                    url: link,
+                    publicationDate: new Date(pubDate),
+                    sourceId: sources[i].id
+                  }
+                });
+              }
+            });
+          }
         } catch (error) {
           logger.info(error);
         }
@@ -533,7 +535,8 @@ exports.insertStopword = async (req, res) => {
 exports.insertSource = async (req, res) => {
   await Sources.create({
     name: req.query.name,
-    url: req.query.url
+    url: req.query.url,
+    rss: req.query.rss
   }).catch(error => logger.info(error));
   return res.send('Ok, inserted source');
 };
