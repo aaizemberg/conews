@@ -12,6 +12,10 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING,
         allowNull: false
       },
+      rss: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
       lastUpdate: {
         type: Sequelize.DATEONLY,
         allowNull: true
