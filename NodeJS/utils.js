@@ -6,11 +6,6 @@ exports.insertSources = async () => {
   for (let i = 0; i < SOURCES.length; i++) {
     const { name, url, rss } = SOURCES[i];
     try {
-      await Sources.destroy({
-        where: {
-          name
-        }
-      });
       await Sources.upsert({
         name,
         url,
