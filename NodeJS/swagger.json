@@ -5,9 +5,9 @@
      "description": "Repository: https://github.com/aaizemberg/conews ",
      "version": "v1"
    },
-   "host": "localhost:8080",
+   "host": "newsapi.it.itba.edu.ar",
    "schemes": [
-     "http"
+     "https"
    ],
    "basePath": "/api/v1/",
    "consumes": [
