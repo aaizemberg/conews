@@ -9,52 +9,50 @@ const { getNews } = require('../services/googleNews'),
   schedule = require('node-schedule'),
   { News, Sources, Stopwords, Entities, EntitiesNews } = require('../models'),
   { success, getCurrentDate } = require('./utils'),
-  { DEFAULT_ARRAY, DEFAULT_TYPES_ENTITIES, SOURCES } = require('./constants'),
+  { DEFAULT_ARRAY, DEFAULT_TYPES_ENTITIES } = require('./constants'),
   db = require('../models');
 
-const getPeriodicNewsJob = async () => {
+const getPeriodicNewsJob = () => {
   logger.info('Getting news...');
-  // return Sources.findAll()
-  //   .then(async sources => {
-  try {
-    for (let i = 0; i < SOURCES.length; i++) {
-      try {
-        const response = await getNews([SOURCES[i].rss]);
-        await Sources.update(
-          {
-            lastUpdate: getCurrentDate()
-          },
-          {
-            where: { url: SOURCES[i].url }
-          }
-        );
-        response.items.map(async item => {
-          const { title, link, pubDate } = item;
-          if (link.startsWith(SOURCES[i].url)) {
-            const itemTitle = title.split(' - ')[0];
-            await News.findOrCreate({
-              where: {
-                url: item.link,
-                title: item.title.split(' - ')[0]
+  return Sources.findAll()
+    .then(async sources => {
+      for (let i = 0; i < sources.length; i++) {
+        try {
+          if (sources[i].rss) {
+            const response = await getNews([sources[i].rss]);
+            await Sources.update(
+              {
+                lastUpdate: getCurrentDate()
               },
-              defaults: {
-                title: itemTitle,
-                url: link,
-                publicationDate: new Date(pubDate),
-                sourceId: SOURCES[i].id
+              {
+                where: { url: sources[i].url }
+              }
+            );
+            response.items.map(async item => {
+              const { title, link, pubDate } = item;
+              if (link.startsWith(sources[i].url)) {
+                const itemTitle = title.split(' - ')[0];
+                await News.findOrCreate({
+                  where: {
+                    url: item.link,
+                    title: item.title.split(' - ')[0]
+                  },
+                  defaults: {
+                    title: itemTitle,
+                    url: link,
+                    publicationDate: new Date(pubDate),
+                    sourceId: sources[i].id
+                  }
+                });
               }
             });
           }
-        });
-      } catch (error) {
-        logger.info(error);
+        } catch (error) {
+          logger.info(error);
+        }
       }
-    }
-  } catch (error) {
-    logger.info(error);
-  }
-  // })
-  // .catch(error => logger.info(error));
+    })
+    .catch(error => logger.info(error));
 };
 
 exports.getEntities = async (req, res) => {
@@ -537,7 +535,8 @@ exports.insertStopword = async (req, res) => {
 exports.insertSource = async (req, res) => {
   await Sources.create({
     name: req.query.name,
-    url: req.query.url
+    url: req.query.url,
+    rss: req.query.rss
   }).catch(error => logger.info(error));
   return res.send('Ok, inserted source');
 };
