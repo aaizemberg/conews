@@ -26,24 +26,6 @@ exports.disableAllSessions = token =>
     .set('Accept', 'application/json')
     .set('Authorization', token);
 
-exports.buyAlbum = (album, token) =>
-  request(app)
-    .post(`/albums/${album}`)
-    .set('Accept', 'application/json')
-    .set('Authorization', token);
-
-exports.listBoughtAlbums = (userId, token) =>
-  request(app)
-    .get(`/users/${userId}/albums`)
-    .set('Accept', 'application/json')
-    .set('Authorization', token);
-
-exports.listPhotosBoughtAlbum = (albumId, token) =>
-  request(app)
-    .get(`/users/albums/${albumId}/photos`)
-    .set('Accept', 'application/json')
-    .set('Authorization', token);
-
 exports.user = {
   name: 'Ariel',
   surname: 'Atar',
