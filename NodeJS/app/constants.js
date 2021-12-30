@@ -8,7 +8,6 @@ exports.DESCRIPTOR = {
   swagger: 'https://newsapi.it.itba.edu.ar/api/v1/swagger/'
 };
 
-exports.EMAIL_REGEXP = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@wolox.com.ar$/;
 exports.PASSWORD_REGEXP = /^[0-9a-zA-Z]+$/;
 exports.PASSWORD_MIN_LENGTH = 8;
 
