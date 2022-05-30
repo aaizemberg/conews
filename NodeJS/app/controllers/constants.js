@@ -78,8 +78,8 @@ exports.SOURCES = [
   {
     id: 14,
     name: 'BAE Negocios',
-    url: 'https://www.baenegocios.com',
-    rss: 'https://www.baenegocios.com/feed/feed.xml'
+    url: 'https://www.baenegocios.com.ar',
+    rss: 'https://www.baenegocios.com.ar/feed/feed.xml'
   },
   // {
   //   id: 15,
