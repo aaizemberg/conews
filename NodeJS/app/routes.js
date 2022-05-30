@@ -24,10 +24,6 @@ exports.init = app => {
   app.get('/', (req, res) => res.send(DESCRIPTOR));
   // app.post('/insert-sources', [checkIfUserIsLogged], insertSources);
   // app.get('/periodic-news', getPeriodicNews);
-  // Resuelto: Agregar roles de usuarios admins para que puedan acceder a los post, y que puedan crear nuevos usuarios admin.
-  // Resuelto: En noticias agregar columna booleana para saber si ya se calcularon las entidades, es una marquita que despues cambia oliver
-  // TODO: Subir el proyecto a la maquina del ITBA para ir viendo como funciona
-  // TODO: Modificar documentacion final para entregar
   app.get(`${API_BASE_URL}/cantidad-de-noticias`, getNewsQuantitySQL);
   app.get(`${API_BASE_URL}/heatmap`, heatmapSQL);
   app.get(`${API_BASE_URL}/busqueda`, searchSQL);
