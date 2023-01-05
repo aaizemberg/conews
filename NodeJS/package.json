@@ -8,8 +8,8 @@
   },
   "contributors": [
     "Ariel Atar",
-    "Ariel Aizemberg",
-    "Oliver Balfour"
+    "Oliver Balfour",
+    "Ariel Aizemberg"
   ],
   "scripts": {
     "console": "node console.js",
